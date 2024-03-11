@@ -26,7 +26,7 @@ function App() {
   if (inRoom) {
     return (
       <>
-        <ChatRoom username={username} />
+        <ChatRoom username={username} setUsername={setUsername} />
       </>
     );
   } else {
