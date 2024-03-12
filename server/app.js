@@ -34,9 +34,9 @@ const removeUser = (socketId) => {
   return { status: false };
 };
 
+
 const changeRoom = (socketId, roomName) => {
-  let idx = users.findIndex((user) => user.socketId === socketId);
-  console.log(`changing room for ${users[idx]?.username} to ${roomName}`);
+  let idx = users.findIndex((user) => user.socketId === socketId && user.roomName !== roomName);
   if (idx >= 0) {
     users[idx].roomName = roomName;
     return { status: true, user: users[idx] };
@@ -53,16 +53,21 @@ io.on("connection", (socket) => {
       socketId: socket.id,
       roomName: username,
     };
+
     const result = addUser(newUser);
+
     if(adminid === process.env.ADMINID){
       socket.emit("users", users)
     }
-    changeRoom(socket.id, username);
-    socket.join(username);
 
+    changeRoom(socket.id, username);
+
+    socket.join(username);
+    socket.emit('newMessage', {username: result?.user?.username, message: `Welcome to the room ${username}`})
+
+    socket.broadcast.to(username).emit('newMessge', {username: result?.user?.username, message: `${username} just joined the room`} )
     // Emit user count to all users if the user is new
     if (result.status) {
-      // console.log(users);
       io.emit("users", users);
     }
   });
@@ -70,12 +75,22 @@ io.on("connection", (socket) => {
   // on room join
   socket.on("joinRoom", (roomName,cb) => {
     const result = changeRoom(socket.id, roomName);
-    socket.join(roomName);
-    const newMessage = `${result?.user?.username} joined the room`;
-    io.to(roomName).emit("newMessage", {username: result?.user?.username, message: newMessage});
-    // console.log('emitting new joining message')
-    cb(roomName)
+    if(result.status){
+      socket.join(roomName);
+      const newMessage = `${result?.user?.username} joined the room`;
+      io.to(roomName).emit("newMessage", {username: result?.user?.username, message: newMessage});
+      cb({status: true, roomName:roomName })
+    }
+    cb({status: false})
   });
+
+  //on message
+  socket.on("message", (data) => {
+    const idx = users.findIndex((user) => user?.socketId === socket.id)
+    socket.emit('newMessage', data)
+    socket.broadcast.to(users[idx]?.roomName).emit('newMessage', data )
+    
+  })
 
   // socket disconnected and user is taken out of socket as well as list on frontend by emitting new object
   socket.on("disconnect", () => {
