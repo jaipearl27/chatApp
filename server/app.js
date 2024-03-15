@@ -63,9 +63,9 @@ io.on("connection", (socket) => {
     changeRoom(socket.id, username);
 
     socket.join(username);
-    socket.emit('newMessage', {username: result?.user?.username, message: `Welcome to the room ${username}`})
+    // socket.emit('newMessage', {username: result?.user?.username, message: `Welcome to the room ${username}`})
 
-    socket.broadcast.to(username).emit('newMessge', {username: result?.user?.username, message: `${username} just joined the room`} )
+    // socket.broadcast.to(username).emit('newMessge', {username: result?.user?.username, message: `${username} just joined the room`} )
     // Emit user count to all users if the user is new
     if (result.status) {
       io.emit("users", users);

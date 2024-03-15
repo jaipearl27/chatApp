@@ -27,7 +27,6 @@ function ChatRoom({ username, setUsername }) {
       setIsJoined(true);
       setRoom(username);
     }
-    console.log("joining");
   };
 
   // socket.on for getting users data on join
@@ -64,6 +63,7 @@ function ChatRoom({ username, setUsername }) {
     socket.emit("joinRoom", roomName, (data) => {
       if (data?.status) {
         setRoom(data?.roomName);
+        console.log(`joining${roomName}`);
       } else {
         console.log("user already in the room");
       }
@@ -81,15 +81,15 @@ function ChatRoom({ username, setUsername }) {
       <button onClick={removeLocal}>remove user</button>
       <div className="w-full text-2xl text-center">User: {username}</div>
       <div
-        className={` w-[800px] flex flex-row mx-auto mt-2 border border-gray-400 rounded-lg`}
+        className={` w-[98%] md:w-[800px] flex flex-row mx-auto mt-2 border border-gray-400 rounded-lg`}
       >
-        <div className="w-2/6 border border-gray-400 text-white overflow-y-auto flex flex-col">
+        <div className="w-2/6 border border-gray-400 text-white overflow-y-auto flex flex-col gap-3">
           {/* search input */}
           <div className="w-full flex flex-col justify-center relative p-2">
             <input
               type="text"
               placeholder="Enter MRN Number "
-              className="rounded-full px-3 py-1 border border-gray-400"
+              className="rounded-full px-3 py-1 border border-gray-400 text-black"
             />
             <IoSearchOutline
               className="absolute z-[999] right-4 text-black"
@@ -102,20 +102,33 @@ function ChatRoom({ username, setUsername }) {
               ?.map((user) => (
                 <div
                   key={user?.socketId}
-                  className="w-full p-2 text-black cursor-pointer transition duration-300"
+                  className="flex flex-row gap-2 px-4 py-2 cursor-pointer hover:bg-slate-100 transition duration-300"
                   onClick={() => joinRoom(user?.username)}
                 >
-                  {user?.username}
+                  <div className="h-[40px] w-[40px] flex flex-col justify-center relative">
+                    <img
+                      src="/noProfilePic.webp"
+                      alt="no profile pic"
+                      className="w-[40px] h-[40px] rounded-full absolute"
+                    />
+                    <span className="h-[8px] w-[8px] bg-[#53ff31] rounded-full absolute bottom-0 right-0"></span>
+                  </div>
+                  <div className="text-black flex flex-col justify-center">
+                    <div className="font-medium text-[20px]">
+                      {user?.username}
+                    </div>
+                    <div className="text-xs font-[8px]">Sample last message in this chat...</div>
+                  </div>
                 </div>
               ))}
         </div>
 
         <div className={`w-4/6 bg-white flex flex-col`}>
           {/* room name */}
-          <div className="w-full border border-x-0 border-y-1 border-gray-300 text-white h-[50px] flex flex-col justify-center text-lg pl-4">
+          <div className="w-full border border-x-0 border-y-1 border-gray-300 text-white h-[50px] flex flex-col justify-center text-lg pl-4 py-2">
             {room?.length > 0 ? (
-              <div className="flex flex-row gap-2 h-[35px]">
-                <div className="h-[35px] w-[35px] flex flex-col justify-center relative">
+              <div className="flex flex-row gap-2 ">
+                <div className="h-[40px] w-[40px] flex flex-col justify-center relative">
                   <img
                     src="/noProfilePic.webp"
                     alt="no profile pic"
@@ -123,13 +136,9 @@ function ChatRoom({ username, setUsername }) {
                   />
                   <span className="h-[8px] w-[8px] bg-[#53ff31] rounded-full absolute bottom-0 right-0"></span>
                 </div>
-                <div className="h-full text-black flex flex-col">
-                  <span className="font-medium text-[16px]" >
-                    {room}
-                  </span>
-                  <span className="text-xs font-[10px]">
-                    Available
-                  </span>
+                <div className="text-black flex flex-col justify-center">
+                  <div className="font-medium text-[20px]">{room}</div>
+                  <div className="text-xs font-[8px]">Available</div>
                 </div>
               </div>
             ) : (
@@ -152,13 +161,13 @@ function ChatRoom({ username, setUsername }) {
                                 12/03/2024
                               </small>
                               <div>
-                                <span
+                                <div
                                   className="bg-[#00116c]
-                              text-white text-center px-3 py-2 shadow-xs text-wrap break-words"
+                              text-white px-3 py-2 shadow-xs text-x` "
                                   style={{ borderRadius: "5px 5px 0 5px" }}
                                 >
                                   {message?.message}
-                                </span>
+                                </div>
                               </div>
                             </div>
                           </div>
