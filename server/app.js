@@ -77,8 +77,8 @@ io.on("connection", (socket) => {
     const result = changeRoom(socket.id, roomName);
     if(result.status){
       socket.join(roomName);
-      const newMessage = `${result?.user?.username} joined the room`;
-      io.to(roomName).emit("newMessage", {username: result?.user?.username, message: newMessage});
+      // const newMessage = `${result?.user?.username} joined the room`;
+      // io.to(roomName).emit("newMessage", {username: result?.user?.username, message: newMessage});
       cb({status: true, roomName:roomName })
     }
     cb({status: false})

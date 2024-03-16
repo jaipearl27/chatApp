@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { IoSearchOutline } from "react-icons/io5";
 import { BsSend } from "react-icons/bs";
+import { GrAttachment } from "react-icons/gr";
 
 const socket = io("http://localhost:6969");
 
@@ -12,6 +13,12 @@ function ChatRoom({ username, setUsername }) {
   const [users, setUsers] = useState([]);
   const [room, setRoom] = useState("");
   const [isJoined, setIsJoined] = useState(false); // Track whether join event is emitted
+
+  const [dateOptions, setDateOptions] = useState({
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
   // const messageInput = useRef()
 
@@ -55,8 +62,10 @@ function ChatRoom({ username, setUsername }) {
 
   const handleMessageSend = () => {
     // alert('sending message')
-    socket.emit("message", { username: username, message: messageInput });
-    setMessageInput("");
+    if(messageInput.length > 0){
+      socket.emit("message", { username: username, message: messageInput });
+      setMessageInput("");
+    }
   };
 
   const joinRoom = (roomName) => {
@@ -105,11 +114,11 @@ function ChatRoom({ username, setUsername }) {
                   className="flex flex-row gap-2 px-4 py-2 cursor-pointer hover:bg-slate-100 transition duration-300"
                   onClick={() => joinRoom(user?.username)}
                 >
-                  <div className="h-[40px] w-[40px] flex flex-col justify-center relative">
+                  <div className="h-[30px] w-[30px] md:h-[40px] md:w-[40px] flex flex-col justify-center relative">
                     <img
                       src="/noProfilePic.webp"
                       alt="no profile pic"
-                      className="w-[40px] h-[40px] rounded-full absolute"
+                      className="w-[100%] h-[100%] rounded-full absolute"
                     />
                     <span className="h-[8px] w-[8px] bg-[#53ff31] rounded-full absolute bottom-0 right-0"></span>
                   </div>
@@ -117,7 +126,9 @@ function ChatRoom({ username, setUsername }) {
                     <div className="font-medium text-[20px]">
                       {user?.username}
                     </div>
-                    <div className="text-xs font-[8px]">Sample last message in this chat...</div>
+                    <div className="text-xs font-[8px]">
+                      Sample last message in this chat...
+                    </div>
                   </div>
                 </div>
               ))}
@@ -132,7 +143,7 @@ function ChatRoom({ username, setUsername }) {
                   <img
                     src="/noProfilePic.webp"
                     alt="no profile pic"
-                    className="w-[35px] h-[35px] rounded-full absolute"
+                    className="w-[100%] h-[100%] rounded-full absolute"
                   />
                   <span className="h-[8px] w-[8px] bg-[#53ff31] rounded-full absolute bottom-0 right-0"></span>
                 </div>
@@ -146,7 +157,7 @@ function ChatRoom({ username, setUsername }) {
             )}
           </div>
           {/* chat box */}
-          <div className="w-full h-[500px] overflow-y-auto overflow-x-hidden flex flex-col gap-2 px-2 py-6">
+          <div className="w-full h-[500px] overflow-y-auto overflow-x-hidden flex flex-col gap-6 md:gap-2 px-2 py-6">
             {room?.length > 0 && (
               <>
                 {messages &&
@@ -155,10 +166,10 @@ function ChatRoom({ username, setUsername }) {
                       {message?.username == username ? (
                         <>
                           {/* message right */}
-                          <div className="w-full flex flex-row justify-end">
-                            <div className="flex flex-col gap-2 text-right relative">
+                          <div className="w-full flex flex-row justify-end ">
+                            <div className="flex flex-col text-right relative w-fit max-w-[80%] text-sm md:text-base">
                               <small className="text-[10px] pr-1">
-                                12/03/2024
+                                16/03/2024
                               </small>
                               <div>
                                 <div
@@ -173,20 +184,20 @@ function ChatRoom({ username, setUsername }) {
                           </div>
                         </>
                       ) : (
-                        <>
+                        <div className="flex flex-col justify-center">
                           {/* message left */}
-                          <div className="w-full flex">
-                            <div className="flex flex-row gap-1">
-                              <div className="h-full flex flex-col justify-center">
+                          <div className="w-full flex px-3">
+                            <div className="flex flex-row gap-1 text-sm md:text-base">
+                              <div className="h-full">
                                 <img
                                   src="/noProfilePic.webp"
                                   alt="no profile pic"
                                   className="w-[30px] h-[30px] rounded-full relative"
                                 />
                               </div>
-                              <div className="flex flex-col gap-[2px] text-left relative">
-                                <small className="text-[10px] absolute -top-4">
-                                  12/03/2024
+                              <div className="flex flex-col text-left relative max-w-[80%]">
+                                <small className="text-[10px] absolute -top-5">
+                                  16/03/2024
                                 </small>
                                 <span
                                   className="bg-[#ececff] text-gray-700 border px-3 py-1 shadow-xs text-wrap break-words"
@@ -197,7 +208,7 @@ function ChatRoom({ username, setUsername }) {
                               </div>
                             </div>
                           </div>
-                        </>
+                        </div>
                       )}
                     </div>
                   ))}
@@ -207,6 +218,16 @@ function ChatRoom({ username, setUsername }) {
           <div className="flex gap-2 border border-y-1 border-gray-400 p-2">
             {room?.length > 0 && (
               <>
+                <button
+                  type="button"
+                  className="w-fit p-1 rounded-md text-white"
+                  // onClick={handleMessageSend}
+                >
+                  <GrAttachment
+                    className="text-black"
+                    size={30}
+                  />
+                </button>
                 <input
                   type="text"
                   className="w-full text-center p-1 border border-gray-200 bg-[#ececff] rounded-md"
