@@ -4,10 +4,10 @@ import { IoSearchOutline } from "react-icons/io5";
 import { BsSend } from "react-icons/bs";
 import { GrAttachment } from "react-icons/gr";
 
-const socket = io("http://localhost:6969");
+const socket = io("http://localhost:6969/onetoone");
 
 function ChatRoom({ username, setUsername }) {
-  console.log("current user:", username);
+  
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
   const [users, setUsers] = useState([]);
@@ -25,6 +25,7 @@ function ChatRoom({ username, setUsername }) {
   // emit for joining and sending your data
   useEffect(() => {
     joinEmit();
+    console.log("current user:", username);
   }, []);
 
   // user joining emit on page load
