@@ -1,47 +1,55 @@
-import express  from "express";
+import express from "express";
 import { Server } from "socket.io";
-import cors from 'cors'
-import http from 'http'
+import cors from "cors";
+import http from "http";
 import { addUser, removeUser, changeRoom } from "./src/utils/users.js";
+import { mongoConnect } from "./src/configs/mongoDB.js";
+
+// importing controllers
+import { getAllEmployees } from "./src/controllers/employeeController.js";
 
 const app = express();
 const PORT = process.env.PORT || 6969;
 
-
 // -------------------------------------------CORS HANDLING---------------------------------------------------
-app.use(cors({
-  origin: [
-    "http://localhost:5173"
-  ],
-  credentials: true,
-  methods: ["GET", "PUT", "POST", "PATCH", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token"],
-  exposedHeaders: ["*", "Authorization"],
-}));
-
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+    methods: ["GET", "PUT", "POST", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token"],
+    exposedHeaders: ["*", "Authorization"],
+  })
+);
 
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173"
-  }
+    origin: "http://localhost:5173",
+  },
 });
 
-// root get request 
-app.get('/', (req, res) => {
-  res.send(`Not allowed you simp, go back.`)
+// connecting MongoDB
+
+mongoConnect();
+
+// root get request
+app.get("/", (req, res) => {
+  res.send(`Not allowed you simp, go back.`);
 });
 
-
-
-
-const oneToOneNamespace = io.of("/onetoone")
+const oneToOneNamespace = io.of("/onetoone");
 
 oneToOneNamespace.on("connection", (socket) => {
   // user joins
-  console.log(`user with ${socket.id} joined`)
-  socket.on("join", (username, adminid) => {
+  console.log(`user with ${socket.id} joined`);
+  socket.on("join", async (username, adminid) => {
     // new user added to local object
+
+    const employees = await getAllEmployees();
+    console.log(employees);
+
+    // debugger;
     const newUser = {
       username: username,
       socketId: socket.id,
@@ -87,8 +95,8 @@ oneToOneNamespace.on("connection", (socket) => {
 
   // socket disconnected and user is taken out of socket as well as list on frontend by emitting new object
   socket.on("disconnect", () => {
-      const result = removeUser(socket.id);
-      if (result.status) io.emit("users", result.users);
+    const result = removeUser(socket.id);
+    if (result.status) io.emit("users", result.users);
     console.log(`user with id ${socket.id} left`);
   });
 });

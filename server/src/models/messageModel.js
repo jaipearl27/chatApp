@@ -1,14 +1,28 @@
 import mongoose from "mongoose";
+
 const messageSchema = new mongoose.Schema(
   {
-    position: {
+    roomId: {
       type: String,
-      required: [true, "Position name is required"],
+      required: [true, "roomId is required"],
       trim: true,
-      minLength: [2, "Position must contain at least 2 characters"],
-      maxLength: [40, "Position should contain maximum 40 characters"],
+    },
+    userid : {
+      type: String,
+      required: [true, "user id is required"],
+      trim: true
+    },
+    username : {
+      type: String,
+      required: [true, "user id is required"],
+      trim: true
+    },
+    message: {
+      type: String,
+      required: [true, "message is required"],
+      trim: true
     }
   },
   { timestamps: true }
 );
-export const jobModel = mongoose.model("messages", jobSchema, "job");
+export const messageModel = mongoose.model("messages", messageSchema, "job");
