@@ -7,7 +7,7 @@ dotenv.config();
 export const mongoConnect = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log(chalk.bgBlueBright("Mongo Database connection successful"));
+    console.log(chalk.white.bgBlue("MongoDB connected successfully"));
   } catch (error) {
     console.log(
       error.message
