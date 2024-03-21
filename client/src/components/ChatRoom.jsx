@@ -82,11 +82,16 @@ function ChatRoom({ userName, setUserName }) {
     }
   };
 
-  const joinRoom = (roomName) => {
+  const joinRoom = (receiverName) => { 
+    let arr = [userName, receiverName].sort()
+    let roomName = "";
+    arr.forEach((e) => {
+      roomName += e
+    })
+    console.log(`joining ${roomName} `);
     socket.emit("joinRoom", roomName, (data) => {
       if (data?.status) {
-        setRoom(data?.roomName);
-        console.log(`joining${roomName}`);
+        // setRoom(data?.roomName);
       } else {
         console.log("user already in the room");
       }
@@ -107,7 +112,7 @@ function ChatRoom({ userName, setUserName }) {
       <div
         className={` w-[98%] md:w-[800px] flex flex-row mx-auto mt-2 border border-gray-400 rounded-lg`}
       >
-        <UserList users={users} setUsers={setUsers} userName={userName} />
+        <UserList users={users} setUsers={setUsers} userName={userName} joinRoom={joinRoom} />
 
         {room?.length > 0 ? (
           <div className={`w-4/6 h-[80vh] bg-white flex flex-col`}>

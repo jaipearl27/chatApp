@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
+import { IoIosArrowForward } from "react-icons/io"
 import axios from "axios";
 import { MagnifyingGlass } from "react-loader-spinner";
 
-const UserList = ({ myChats, setUsers, userName }) => {
+const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
   const [searchInput, setSearchInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchedUsers, setSearchedUsers] = useState([]);
@@ -34,7 +35,7 @@ const UserList = ({ myChats, setUsers, userName }) => {
   }, [searchInput]);
 
   return (
-    <div className="w-2/6 border border-gray-400 text-white overflow-y-auto flex flex-col gap-3">
+    <div className="w-2/6 border border-gray-400 text-white flex flex-col gap-3">
       {/* search input */}
       <div className="flex flex-col gap-1">
         <div className="w-full flex flex-col justify-center relative p-2">
@@ -54,7 +55,7 @@ const UserList = ({ myChats, setUsers, userName }) => {
         {searchInput.length > 0 && (
           <div className="w-[95%] mx-auto flex flex-col bg-gray-100 shadow-lg transition duration-300 border border-gray-400 rounded-sm max-h-[400px] overflow-y-auto">
             {isLoading ? (
-              <>
+              <div className="w-full flex justify-center py-1">
                 <MagnifyingGlass
                   visible={true}
                   height="40"
@@ -65,17 +66,17 @@ const UserList = ({ myChats, setUsers, userName }) => {
                   glassColor="#c0efff"
                   color="#023d9d"
                 />
-              </>
+              </div>
             ) : (
               <>
-                {searchedUsers?.length > 0 &&
+                {searchedUsers?.length > 0 ? (
                   searchedUsers
                     ?.filter((u) => u?.userName !== userName)
                     ?.map((user) => (
                       <div
                         key={user?._id}
-                        className="flex flex-row gap-2 px-4 py-2 cursor-pointer transition duration-300 even:bg-white odd:bg-gray-100 hover:bg-slate-200"
-                        // onClick={() => joinRoom(user?.userName)}
+                        className="relative flex flex-row gap-2 px-4 py-2 cursor-pointer transition duration-300 even:bg-white odd:bg-gray-100 hover:bg-slate-200"
+                        onClick={() => joinRoom(user?.userName)}
                       >
                         <div className="h-[20px] w-[20px] md:h-[20px] md:w-[20px] flex flex-col justify-center relative">
                           <img
@@ -94,14 +95,23 @@ const UserList = ({ myChats, setUsers, userName }) => {
                             {user?.firstName + " " + user?.lastName}
                           </div>
                         </div>
+                        <IoIosArrowForward className="absolute right-1 text-black" size={20}/>
                       </div>
-                    ))}
+                    ))
+                  ) : (
+                    <div className="w-full text-center py-1 text-black">
+                      No Users found
+                    </div>
+                  )}
               </>
             )}
           </div>
         )}
       </div>
+      
+      <div className="max-h-[90%] overflow-y-auto">
 
+      </div>
       {myChats &&
         myChats
           ?.filter((u) => u?.userName !== userName)
