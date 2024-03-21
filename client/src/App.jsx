@@ -33,8 +33,8 @@ function App() {
     return (
       <>
         <div className="w-full flex justify-center mt-2">
-          <div className="flex flex-col">
-            <label htmlFor="username">Username</label>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="username">Enter Username</label>
             <input
               type="text"
               placeholder="enter username"
@@ -43,7 +43,7 @@ function App() {
             />
             <button
               type="button"
-              className="bg-blue-500 hover:bg-blue-700 transition duration-300"
+              className="bg-blue-500 hover:bg-blue-700  text-white p-2 rounded  transition duration-300"
               onClick={enterRoom}
             >
               Enter Chat
