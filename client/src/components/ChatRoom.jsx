@@ -82,16 +82,18 @@ function ChatRoom({ userName, setUserName }) {
     }
   };
 
-  const joinRoom = (receiverName) => { 
-    let arr = [userName, receiverName].sort()
+  const joinRoom = (receiverName, roomType, roomTitle) => { 
+    
+    let users = [userName, receiverName].sort()
     let roomName = "";
-    arr.forEach((e) => {
+    users.forEach((e) => {
       roomName += e
     })
     console.log(`joining ${roomName} `);
-    socket.emit("joinRoom", roomName, (data) => {
+    socket.emit("joinRoom", {roomTitle, roomName,users, roomType}, (data) => {
       if (data?.status) {
-        // setRoom(data?.roomName);
+        setRoom(data?.room?.roomTitle);
+        console.log(data?.room)
       } else {
         console.log("user already in the room");
       }
@@ -115,7 +117,7 @@ function ChatRoom({ userName, setUserName }) {
         <UserList users={users} setUsers={setUsers} userName={userName} joinRoom={joinRoom} />
 
         {room?.length > 0 ? (
-          <div className={`w-4/6 h-[80vh] bg-white flex flex-col`}>
+          <div className={`w-4/6 h-[80vh] bg-white flex flex-col rounded-lg`}>
             {/* other user's name and image */}
             <div className="w-full border border-x-0 border-y-1 border-gray-300 text-black h-[50px] flex flex-col justify-center text-lg pl-4 py-2">
               <div className="flex flex-row gap-2 ">
@@ -217,7 +219,7 @@ function ChatRoom({ userName, setUserName }) {
             </div>
           </div>
         ) : (
-          <div className="w-4/6 h-[80vh] bg-white flex flex-col justify-center text-center text-2xl font-medium">
+          <div className="w-4/6 h-[80vh] bg-white flex flex-col justify-center text-center text-2xl font-medium rounded-lg">
             Select a user to talk to start chatting
           </div>
         )}

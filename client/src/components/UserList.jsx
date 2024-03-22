@@ -20,7 +20,8 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
         .get(`${import.meta.env.VITE_API_URL}/employees/employee/${searchInput}`)
         .then((res) => {
           if (res?.data?.status) {
-            setSearchedUsers(res?.data?.employee);
+            let filteredUsers = res?.data?.employee?.filter((u) => u?.userName !== userName)
+            setSearchedUsers(filteredUsers);
           }
           setIsLoading(false);
         })
@@ -35,7 +36,10 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
   }, [searchInput]);
 
   return (
-    <div className="w-2/6 border border-gray-400 text-white flex flex-col gap-3">
+    <div 
+      className="w-2/6 text-white flex flex-col gap-3"
+      style={{borderRight: '1px solid #9ca3af'}}
+    >
       {/* search input */}
       <div className="flex flex-col gap-1">
         <div className="w-full flex flex-col justify-center relative p-2">
@@ -70,13 +74,11 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
             ) : (
               <>
                 {searchedUsers?.length > 0 ? (
-                  searchedUsers
-                    ?.filter((u) => u?.userName !== userName)
-                    ?.map((user) => (
+                  searchedUsers?.map((user) => (
                       <div
                         key={user?._id}
                         className="relative flex flex-row gap-2 px-4 py-2 cursor-pointer transition duration-300 even:bg-white odd:bg-gray-100 hover:bg-slate-200"
-                        onClick={() => joinRoom(user?.userName)}
+                        onClick={() => joinRoom(user?.userName, "oneToOne", `${user?.firstName} ${user?.lastName}`)}
                       >
                         <div className="h-[20px] w-[20px] md:h-[20px] md:w-[20px] flex flex-col justify-center relative">
                           <img
@@ -95,12 +97,12 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
                             {user?.firstName + " " + user?.lastName}
                           </div>
                         </div>
-                        <IoIosArrowForward className="absolute right-1 text-black" size={20}/>
+                        <IoIosArrowForward className="absolute right-1 text-[#121212]" size={20}/>
                       </div>
                     ))
                   ) : (
-                    <div className="w-full text-center py-1 text-black">
-                      No Users found
+                    <div className="w-full text-center py-1 font-medium text-[#494949]">
+                      No results
                     </div>
                   )}
               </>
@@ -131,7 +133,7 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
                   className={`h-[8px] w-[8px] bg-[#53ff31] rounded-full absolute bottom-0 right-0`}
                 ></span>
               </div>
-              <div className="text-black flex flex-col justify-center">
+              <div className="text-[#121212] flex flex-col justify-center">
                 <div className="font-medium text-[20px]">
                   {user?.firstName + " " + user?.lastName}
                 </div>

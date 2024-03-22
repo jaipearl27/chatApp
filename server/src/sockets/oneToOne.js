@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { addUser, removeUser } from "../../src/utils/users.js";
-import { changeRoom } from "../utils/rooms.js";
+import { addRoom, changeRoom } from "../utils/rooms.js";
 
 export function configureOneToOneNamespace(server) {
   const io = new Server(server, {
@@ -45,13 +45,14 @@ export function configureOneToOneNamespace(server) {
     });
 
     // on room join
-    socket.on("joinRoom", (roomName, cb) => {
-      const result = addRoom(roomName, );
+    socket.on("joinRoom", ({roomTitle, roomName, users, roomType}, cb) => {
+      const result = addRoom(roomTitle,roomName, users, roomType );
       if (result.status) {
-        socket.join(roomName);
+        console.log(result)
+        socket.join(result?.room?.roomName);
         // const newMessage = `${result?.user?.username} joined the room`;
         // io.to(roomName).emit("newMessage", {username: result?.user?.username, message: newMessage});
-        cb({ status: true, roomName: roomName });
+        cb({ status: true, room: result.room });
       }
       cb({ status: false });
     });
