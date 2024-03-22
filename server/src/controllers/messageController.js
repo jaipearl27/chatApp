@@ -1,6 +1,6 @@
 import { messageModel } from "../models/messageModel.js";
 
-// // get all jobs data for the type
+// // get all jobs data for the room/chat
 export const getAllMessages = async (roomId) => {
   try {
     if (!roomId) res.status(400).json({ message: "id not found" });
@@ -31,13 +31,42 @@ export const getAllMessages = async (roomId) => {
   }
 };
 
-export const addMessage = async (roomId, message) => {
+export const addMessage = async (roomId, userId, userName, message) => {
   try {
     const data = {
       roomId: roomId,
       userId: userId,
-      username: username,
-      message: message
+      userName: userName,
+      message: message,
+      readBy: [userName]
+    }
+    const result = await messageModel.insert(data);
+    console.log('message added', result)
+    if(result){
+      return {status: true, data: data}
+    } 
+    return {status: false, data: null}
+
+  } catch (error) {
+    console.log(error);
+    const response = {
+      data: [],
+      status: false,
+      messages: error?.message,
+    };
+    return response;
+  }
+};
+
+
+export const updateReadReceipt = async (roomId, userId, userName, message) => {
+  try {
+    const data = {
+      roomId: roomId,
+      userId: userId,
+      userName: userName,
+      message: message,
+      readBy: [userName]
     }
     const result = await messageModel.insert(data);
     console.log('message added', result)

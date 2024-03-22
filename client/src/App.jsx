@@ -4,29 +4,29 @@ import "./App.css";
 
 import ChatRoom from "./components/ChatRoom";
 
-let user = localStorage.getItem('username')
+let user = localStorage.getItem('userName')
 
 function App() {
   // states
-  const [username, setUsername] = useState("");
+  const [userName, setUserName] = useState("");
   const [inRoom, setInRoom] = useState(false);
 
   useEffect(() => {
     if(user?.length > 0){
-      setUsername(user);
+      setUserName(user);
       setInRoom(true)
     }
   }, []);
 
   const enterRoom = () => {
-    if (username.length > 0) setInRoom(true);
-    localStorage.setItem("username", username);
+    if (userName.length > 0) setInRoom(true);
+    localStorage.setItem("userName", userName);
   };
 
   if (inRoom) {
     return (
       <>
-        <ChatRoom username={username} setUsername={setUsername} />
+        <ChatRoom userName={userName} setUserName={setUserName} />
       </>
     );
   } else {
@@ -34,12 +34,12 @@ function App() {
       <>
         <div className="w-full flex justify-center mt-2">
           <div className="flex flex-col gap-2">
-            <label htmlFor="username">Enter Username</label>
+            <label htmlFor="userName">Enter userName</label>
             <input
               type="text"
-              placeholder="enter username"
+              placeholder="enter userName"
               className="p-3 border border-black rounded "
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => setUserName(e.target.value)}
             />
             <button
               type="button"
