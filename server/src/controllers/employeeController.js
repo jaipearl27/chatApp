@@ -1,4 +1,5 @@
 import { employeeModel } from "../models/employeeModel.js";
+import { getActiveUsers } from "../utils/users.js";
 
 async function getAllEmployees() {
   try {
@@ -47,11 +48,15 @@ async function getEmployee(req, res) {
         )
         
       }
+      // console.log(filteredEmployee )
+      let activeUsersData = getActiveUsers(filteredEmployee)
+      // console.log(activeUsersData)
 
       res.status(200).json({
         status: true,
         message: "Employee Found Successfully",
         employee: filteredEmployee,
+        activeUsers:activeUsersData
       })
     }
   } catch (error) {

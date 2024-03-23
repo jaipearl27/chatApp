@@ -14,16 +14,16 @@ export function configureOneToOneNamespace(server) {
   oneToOneNamespace.on("connection", (socket) => {
     // user joins
     console.log(`user with ${socket.id} joined`);
-    socket.on("join", async (username, adminid) => {
+    socket.on("join", async (userName, adminid) => {
       // new user added to local object
 
     //   const employees = await getAllEmployees();
     //   console.log(employees);
 
       const newUser = {
-        username: username,
+        userName: userName,
         socketId: socket.id,
-        roomName: username,
+        roomName:"",
       };
 
       const result = addUser(newUser);
@@ -32,12 +32,12 @@ export function configureOneToOneNamespace(server) {
         socket.emit("users", result.users);
       }
 
-      changeRoom(socket.id, username);
+      // changeRoom(socket.id, userName);
 
-      socket.join(username);
-      // socket.emit('newMessage', {username: result?.user?.username, message: `Welcome to the room ${username}`})
+      // socket.join(userName);
+      // socket.emit('newMessage', {userName: result?.user?.userName, message: `Welcome to the room ${userName}`})
 
-      // socket.broadcast.to(username).emit('newMessge', {username: result?.user?.username, message: `${username} just joined the room`} )
+      // socket.broadcast.to(userName).emit('newMessge', {userName: result?.user?.userName, message: `${userName} just joined the room`} )
       // Emit user count to all users if the user is new
       if (result.status) {
         io.emit("users", result.users);
@@ -50,8 +50,8 @@ export function configureOneToOneNamespace(server) {
       if (result.status) {
         console.log(result)
         socket.join(result?.room?.roomName);
-        // const newMessage = `${result?.user?.username} joined the room`;
-        // io.to(roomName).emit("newMessage", {username: result?.user?.username, message: newMessage});
+        // const newMessage = `${result?.user?.userName} joined the room`;
+        // io.to(roomName).emit("newMessage", {userName: result?.user?.userName, message: newMessage});
         cb({ status: true, room: result.room });
       }
       cb({ status: false });

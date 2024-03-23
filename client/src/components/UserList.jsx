@@ -8,6 +8,10 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
   const [searchInput, setSearchInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchedUsers, setSearchedUsers] = useState([]);
+  const [activeUsers, setActiveUsers] = useState([])
+
+
+
 
   useEffect(() => {
     if (searchInput.length <= 0) {
@@ -22,6 +26,7 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
           if (res?.data?.status) {
             let filteredUsers = res?.data?.employee?.filter((u) => u?.userName !== userName)
             setSearchedUsers(filteredUsers);
+            processActiveUsers(res?.data?.activeUsers)
           }
           setIsLoading(false);
         })
@@ -34,6 +39,23 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
     return () => clearTimeout(getData)
 
   }, [searchInput]);
+
+  const joinRoomHandler = (receiverName, roomType, roomTitle) => {
+    setSearchInput("")
+    joinRoom(receiverName, roomType, roomTitle)
+  }
+
+  // processing active user data as per the user data that comes
+  // const processActiveUsers = () => {
+  //   let currentActiveUsers = activeUsers
+  //   let searchedUserData = searchedUsers
+  //   currentActiveUsers.forEach((user) => {
+  //       searchedUsers.forEach((searchedUser) = > {
+  //         if(user?.userName === searchedUser)
+  //       })
+  //   })
+  // }
+
 
   return (
     <div 
@@ -78,9 +100,12 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
                       <div
                         key={user?._id}
                         className="relative flex flex-row gap-2 px-4 py-2 cursor-pointer transition duration-300 even:bg-white odd:bg-gray-100 hover:bg-slate-200"
-                        onClick={() => joinRoom(user?.userName, "oneToOne", `${user?.firstName} ${user?.lastName}`)}
+                        onClick={() => {
+                          joinRoomHandler(user?.userName, "oneToOne", [`${user?.firstName} ${user?.lastName}`, `${userName}`])
+                        }
+                        }
                       >
-                        <div className="h-[20px] w-[20px] md:h-[20px] md:w-[20px] flex flex-col justify-center relative">
+                        <div className="h-[30px] w-[30px] md:h-[30px] md:w-[30px] flex flex-col justify-center relative">
                           <img
                             src={`${
                               user?.avatar ? user?.avatar : "/noProfilePic.webp"
@@ -88,12 +113,19 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
                             alt="no profile pic"
                             className="w-[100%] h-[100%] rounded-full absolute"
                           />
-                          {/* <span
-                            className={`h-[6px] w-[6px] bg-[#53ff31] rounded-full absolute bottom-0 right-0`}
-                          ></span> */}
+                          {user?.status ? (
+                            <span
+                              className={`h-[8px] w-[8px] bg-[#53ff31]
+                              border border-[#121212] rounded-full absolute bottom-0 right-0`}
+                            ></span>
+                          ) : (
+                            <span
+                              className={`h-[8px] w-[8px] bg-white border border-[#121212] rounded-full absolute bottom-0 right-0`}
+                            ></span>
+                          )}
                         </div>
                         <div className="text-black flex flex-col justify-center">
-                          <div className="font-medium text-[14px]">
+                          <div className="font-medium text-[16px]">
                             {user?.firstName + " " + user?.lastName}
                           </div>
                         </div>

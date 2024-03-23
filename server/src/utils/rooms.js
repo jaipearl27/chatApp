@@ -15,7 +15,8 @@ export const addRoom = (roomTitle, roomName, users, roomType, admins = []) => {
 
     return { status: true, room: roomData };
   }
-  return { status: false, room: rooms[idx] };
+  //  bruh, if already exits then user is probably changing room
+  return { status: true, room: rooms[idx] };
 };
 
 export const findRoom = (roomName) => {

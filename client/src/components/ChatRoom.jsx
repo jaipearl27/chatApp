@@ -92,7 +92,19 @@ function ChatRoom({ userName, setUserName }) {
     console.log(`joining ${roomName} `);
     socket.emit("joinRoom", {roomTitle, roomName,users, roomType}, (data) => {
       if (data?.status) {
-        setRoom(data?.room?.roomTitle);
+        // if room type is oneToOne then roomTitle will be of the other name out of 2 in that array
+        if(data?.room?.roomType === 'oneToOne'){
+          let roomTitleArr = data?.room?.roomTitle
+          console.log(roomTitleArr)
+          let idx = roomTitleArr?.findIndex((name) => name === userName)
+          if(idx >= 0){
+            roomTitleArr.slice(idx, 1)
+            setRoom(roomTitleArr[0]);
+          } 
+        } else {
+          // if roomType is not one to one , then obviously it will be group or comminity in which only admin can enter name of the same, so no issues in using 
+          data?.room?.roomTitle[0]
+        }
         console.log(data?.room)
       } else {
         console.log("user already in the room");
@@ -109,8 +121,8 @@ function ChatRoom({ userName, setUserName }) {
 
   return (
     <>
-      <button onClick={removeLocal}>remove user</button>
-      <div className="w-full text-2xl text-center">User: {userName}</div>
+      <button className="bg-red-400 px-2 py-1 rounded ml-2 text-white" onClick={removeLocal}>remove user</button>
+      <div className="w-full text-2xl text-center">Current User: {userName}</div>
       <div
         className={` w-[98%] md:w-[800px] flex flex-row mx-auto mt-2 border border-gray-400 rounded-lg`}
       >
@@ -119,7 +131,7 @@ function ChatRoom({ userName, setUserName }) {
         {room?.length > 0 ? (
           <div className={`w-4/6 h-[80vh] bg-white flex flex-col rounded-lg`}>
             {/* other user's name and image */}
-            <div className="w-full border border-x-0 border-y-1 border-gray-300 text-black h-[50px] flex flex-col justify-center text-lg pl-4 py-2">
+            <div className="w-full border border-x-0 border-y-1 border-gray-300 text-black min-h-[50px] flex flex-col justify-center text-lg pl-4 py-2">
               <div className="flex flex-row gap-2 ">
                 <div className="h-[40px] w-[40px] flex flex-col justify-center relative">
                   <img
@@ -137,7 +149,7 @@ function ChatRoom({ userName, setUserName }) {
             </div>
 
             {/* chat box */}
-            <div className="w-full h-[500px] overflow-y-auto overflow-x-hidden flex flex-col gap-6 md:gap-2 px-2 py-6">
+            <div className="w-full h-[90%] max-h-[90%] overflow-y-auto overflow-x-hidden flex flex-col gap-6 md:gap-2 px-2 py-6">
               {/* if room is joined then show chats */}
               {messages &&
                 messages?.map((message, idx) => (

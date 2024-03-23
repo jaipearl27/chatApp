@@ -31,10 +31,10 @@ export const getAllMessages = async (roomId) => {
   }
 };
 
-export const addMessage = async (roomId, userId, userName, message) => {
+export const addMessage = async (roomName, userId, userName, message) => {
   try {
     const data = {
-      roomId: roomId,
+      roomName: roomName,
       userId: userId,
       userName: userName,
       message: message,

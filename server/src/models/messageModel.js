@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(
   {
-    roomId: {
+    roomName: {
       type: String,
-      required: [true, "roomId is required"],
+      required: [true, "roomName is required"],
       trim: true,
     },
     userid : {
