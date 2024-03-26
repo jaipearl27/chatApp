@@ -9,6 +9,7 @@ let user = localStorage.getItem('userName')
 function App() {
   // states
   const [userName, setUserName] = useState("");
+  const [senderName, setSenderName] = useState("");
   const [inRoom, setInRoom] = useState(false);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ function App() {
   if (inRoom) {
     return (
       <>
-        <ChatRoom userName={userName} setUserName={setUserName} />
+        <ChatRoom userName={userName} senderName={senderName} setUserName={setUserName} />
       </>
     );
   } else {
@@ -41,10 +42,24 @@ function App() {
               className="p-3 border border-black rounded "
               onChange={(e) => setUserName(e.target.value)}
             />
+            <label htmlFor="userName">Enter Full Name</label>
+
+            <input
+              type="text"
+              placeholder="enter full name"
+              className="p-3 border border-black rounded "
+              onChange={(e) => setSenderName(e.target.value)}
+            />
             <button
               type="button"
               className="bg-blue-500 hover:bg-blue-700  text-white p-2 rounded  transition duration-300"
-              onClick={enterRoom}
+              onClick={() => {
+                if(userName.length > 0 && senderName.length > 0){
+                  enterRoom()
+                } else {
+                  alert('enter all fields bro')
+                }
+              }}
             >
               Enter Chat
             </button>

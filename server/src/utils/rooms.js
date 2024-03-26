@@ -2,8 +2,8 @@ let rooms = [];
 
 export const addRoom = (roomTitle, roomName, users, roomType, admins = []) => {
   let idx = rooms.findIndex((r) => r.roomName === roomName);
-
-  if (idx <= 0) {
+  console.log(idx)
+  if (idx < 0) {
     let roomData = {
       roomTitle: roomTitle,
       roomName: roomName,
@@ -12,9 +12,10 @@ export const addRoom = (roomTitle, roomName, users, roomType, admins = []) => {
       admins: admins,
     };
     rooms.push(roomData);
-
+    console.log("Rooms=======", rooms)
     return { status: true, room: roomData };
   }
+  console.log("existing Rooms=======", rooms)
   //  bruh, if already exits then user is probably changing room
   return { status: true, room: rooms[idx] };
 };

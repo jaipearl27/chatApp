@@ -7,7 +7,7 @@ import UserList from "./UserList";
 
 const socket = io(import.meta.env.VITE_SOCKET_ONETOONE);
 
-function ChatRoom({ userName, setUserName }) {
+function ChatRoom({ userName, senderName, setUserName }) {
   // states
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
@@ -91,17 +91,20 @@ function ChatRoom({ userName, setUserName }) {
     })
     console.log(`joining ${roomName} `);
     socket.emit("joinRoom", {roomTitle, roomName,users, roomType}, (data) => {
+      console.log(data)
       if (data?.status) {
         // if room type is oneToOne then roomTitle will be of the other name out of 2 in that array
         if(data?.room?.roomType === 'oneToOne'){
           let roomTitleArr = data?.room?.roomTitle
           console.log(roomTitleArr)
-          let idx = roomTitleArr?.findIndex((name) => name === userName)
+          let idx = roomTitleArr?.findIndex((name) => name === senderName)
+          // i am finding idx to be equal to 0 in one case but it is not slicing down
           if(idx >= 0){
-            roomTitleArr.slice(idx, 1)
+            roomTitleArr.splice(idx, 1)
+          
             setRoom(roomTitleArr[0]);
           } 
-        } else {
+        } else {  
           // if roomType is not one to one , then obviously it will be group or comminity in which only admin can enter name of the same, so no issues in using 
           data?.room?.roomTitle[0]
         }
@@ -126,7 +129,7 @@ function ChatRoom({ userName, setUserName }) {
       <div
         className={` w-[98%] md:w-[800px] flex flex-row mx-auto mt-2 border border-gray-400 rounded-lg`}
       >
-        <UserList users={users} setUsers={setUsers} userName={userName} joinRoom={joinRoom} />
+        <UserList users={users} setUsers={setUsers} userName={userName} joinRoom={joinRoom} senderName={senderName}/>
 
         {room?.length > 0 ? (
           <div className={`w-4/6 h-[80vh] bg-white flex flex-col rounded-lg`}>
@@ -135,7 +138,7 @@ function ChatRoom({ userName, setUserName }) {
               <div className="flex flex-row gap-2 ">
                 <div className="h-[40px] w-[40px] flex flex-col justify-center relative">
                   <img
-                    src="/noProfilePic.webp"
+                    src="/noProfilePic.png"
                     alt="no profile pic"
                     className="w-[100%] h-[100%] rounded-full absolute"
                   />

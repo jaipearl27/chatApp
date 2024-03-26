@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { addUser, removeUser } from "../../src/utils/users.js";
+import { addUser, findUser, removeUser } from "../../src/utils/users.js";
 import { addRoom, changeRoom } from "../utils/rooms.js";
 
 export function configureOneToOneNamespace(server) {
@@ -48,8 +48,13 @@ export function configureOneToOneNamespace(server) {
     socket.on("joinRoom", ({roomTitle, roomName, users, roomType}, cb) => {
       const result = addRoom(roomTitle,roomName, users, roomType );
       if (result.status) {
-        console.log(result)
-        socket.join(result?.room?.roomName);
+        // console.log(result)
+        const data = result?.roomName && enterRoom(result?.roomName)
+
+        if(data?.status) {
+
+          socket.join(data?.user?.roomName);
+        }
         // const newMessage = `${result?.user?.userName} joined the room`;
         // io.to(roomName).emit("newMessage", {userName: result?.user?.userName, message: newMessage});
         cb({ status: true, room: result.room });
@@ -58,11 +63,11 @@ export function configureOneToOneNamespace(server) {
     });
 
     //on message
-    // socket.on("message", (data) => {
-    //     const idx = users.findIndex((user) => user?.socketId === socket.id);
-    //     socket.emit("newMessage", data);
-    //     socket.broadcast.to(users[idx]?.roomName).emit("newMessage", data);
-    // });
+    socket.on("message", (data) => {
+        const user = findUser(socket.id)
+        socket.emit("newMessage", data);
+        socket.broadcast.to(user?.roomName).emit("newMessage", data);
+    });
 
     // socket disconnected and user is taken out of socket as well as list on frontend by emitting new object
     socket.on("disconnect", () => {

@@ -38,3 +38,28 @@ export const getActiveUsers = (data) => {
 export const getAllActiveUsers = () => {
   return {status: true, users: users}
 }
+
+
+// enter user in a room
+
+export const enterRoom = (socketId, roomName) => {
+  let idx = users?.findIndex((user) => user?.socketId === socketId)
+
+  if(idx < 1){
+    return {status: false, user:[], message: 'No user found joined in socket'}
+  }
+
+  users[idx].roomName = roomName
+  return {status: true, user:users[idx], message: `User joined room ${roomName}`}
+}
+
+
+// update socketid if user exists in socket
+export const updateSocketId = (userName, socketId) => {
+  let idx = users?.findIndex((user) => user?.userName === userName)
+  if(idx < 0 ){
+    return {status: false, message: "no user in socket to update id for"}
+  }
+  users[idx].socketId = socketId
+  return {status: true, message: "user socket id updated"}
+}

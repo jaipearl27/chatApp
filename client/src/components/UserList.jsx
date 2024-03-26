@@ -4,7 +4,7 @@ import { IoIosArrowForward } from "react-icons/io"
 import axios from "axios";
 import { MagnifyingGlass } from "react-loader-spinner";
 
-const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
+const UserList = ({ myChats, setUsers, userName, joinRoom, senderName}) => {
   const [searchInput, setSearchInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchedUsers, setSearchedUsers] = useState([]);
@@ -101,14 +101,14 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
                         key={user?._id}
                         className="relative flex flex-row gap-2 px-4 py-2 cursor-pointer transition duration-300 even:bg-white odd:bg-gray-100 hover:bg-slate-200"
                         onClick={() => {
-                          joinRoomHandler(user?.userName, "oneToOne", [`${user?.firstName} ${user?.lastName}`, `${userName}`])
+                          joinRoomHandler(user?.userName, "oneToOne", [`${user?.firstName} ${user?.lastName}`, `${senderName}`])
                         }
                         }
                       >
                         <div className="h-[30px] w-[30px] md:h-[30px] md:w-[30px] flex flex-col justify-center relative">
                           <img
                             src={`${
-                              user?.avatar ? user?.avatar : "/noProfilePic.webp"
+                              user?.avatar ? user?.avatar : "/noProfilePic.png"
                             }`}
                             alt="no profile pic"
                             className="w-[100%] h-[100%] rounded-full absolute"
@@ -157,7 +157,7 @@ const UserList = ({ myChats, setUsers, userName, joinRoom }) => {
             >
               <div className="h-[30px] w-[30px] md:h-[40px] md:w-[40px] flex flex-col justify-center relative">
                 <img
-                  src={`${user?.avatar ? user?.avatar : "/noProfilePic.webp"}`}
+                  src={`${user?.avatar ? user?.avatar : "/noProfilePic.png"}`}
                   alt="no profile pic"
                   className="w-[100%] h-[100%] rounded-full absolute"
                 />
