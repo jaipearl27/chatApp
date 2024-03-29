@@ -1,5 +1,10 @@
 import { Server } from "socket.io";
-import { addUser, findUser, removeUser } from "../../src/utils/users.js";
+import {
+  addUser,
+  enterRoom,
+  findUser,
+  removeUser,
+} from "../../src/utils/users.js";
 import { addRoom, changeRoom } from "../utils/rooms.js";
 
 export function configureOneToOneNamespace(server) {
@@ -14,17 +19,15 @@ export function configureOneToOneNamespace(server) {
   oneToOneNamespace.on("connection", (socket) => {
     // user joins
     console.log(`user with ${socket.id} joined`);
+
     socket.on("join", async (userName, adminid) => {
-      // new user added to local object
-
-    //   const employees = await getAllEmployees();
-    //   console.log(employees);
-
       const newUser = {
         userName: userName,
         socketId: socket.id,
-        roomName:"",
+        roomName: "",
       };
+
+      // user added to socket
 
       const result = addUser(newUser);
 
@@ -32,48 +35,58 @@ export function configureOneToOneNamespace(server) {
         socket.emit("users", result.users);
       }
 
-      // changeRoom(socket.id, userName);
-
-      // socket.join(userName);
       // socket.emit('newMessage', {userName: result?.user?.userName, message: `Welcome to the room ${userName}`})
 
       // socket.broadcast.to(userName).emit('newMessge', {userName: result?.user?.userName, message: `${userName} just joined the room`} )
+
       // Emit user count to all users if the user is new
-      if (result.status) {
-        io.emit("users", result.users);
-      }
+
+      // if (result.status) {
+      //   io.emit("users", result.users);
+      // }
     });
 
     // on room join
-    socket.on("joinRoom", ({roomTitle, roomName, users, roomType}, cb) => {
-      const result = addRoom(roomTitle,roomName, users, roomType );
-      if (result.status) {
-        // console.log(result)
-        const data = result?.roomName && enterRoom(result?.roomName)
+    socket.on("joinRoom", ({ roomTitle, roomName, users, roomType }, cb) => {
+      const result = addRoom(roomTitle, roomName, users, roomType);
+      
+    console.log(result)
+      if (result?.status) {
+        const userData = enterRoom(socket.id, result?.room?.roomName);
+        // console.log(userData)
+        socket.join(userData?.user?.roomName);
 
-        if(data?.status) {
-
-          socket.join(data?.user?.roomName);
-        }
-        // const newMessage = `${result?.user?.userName} joined the room`;
-        // io.to(roomName).emit("newMessage", {userName: result?.user?.userName, message: newMessage});
-        cb({ status: true, room: result.room });
+        cb({
+          status: true,
+          userData: userData,
+          roomData: result
+        });
       }
       cb({ status: false });
     });
 
     //on message
     socket.on("message", (data) => {
-        const user = findUser(socket.id)
-        socket.emit("newMessage", data);
-        socket.broadcast.to(user?.roomName).emit("newMessage", data);
+      const user = findUser(socket.id);
+      const messageData = addChat(
+        data?.userId,
+        data?.userName,
+        data?.roomName,
+        data?.message
+      );
+      if (messageData?.status) {
+        socket.emit("newMessage", messageData?.message);
+        socket.broadcast
+          .to(user?.roomName)
+          .emit("newMessage", messageData?.message);
+      }
     });
 
     // socket disconnected and user is taken out of socket as well as list on frontend by emitting new object
     socket.on("disconnect", () => {
       const result = removeUser(socket.id);
       if (result.status) io.emit("users", result.users);
-      console.log(`user with id ${socket.id} left`);
+      // console.log(`user with id ${socket.id} left`);
     });
   });
 

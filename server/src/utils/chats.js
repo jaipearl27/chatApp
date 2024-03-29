@@ -1,4 +1,4 @@
-import { addMessage } from "../controllers/messageController"
+import { addMessage } from "../controllers/messageController.js"
 
 let chats = []
 
@@ -14,8 +14,32 @@ let chats = []
 
 //reactions - [{'userId','userName', 'reaction'}]
 
-export const addChat = (userId, userName, roomId, message, reactions,readBy) => {
-    let message = {}
+export const addChat = (userId, userName, roomName, message, reactions=[],readBy=[]) => {
+    
+    let chat = {userId: userId,userName:userName, roomName:roomName, message:message, reactions:reactions, readBy:readBy, timestamp: new Date() }
+
+    chats.push(chat)
+
+    return {status: true, message: message}
+
+}
+
+
+export const getRoomChatHistory = (roomName) => {
+    let chatHistory = []
+
+    chats.forEach((chat) => {
+        if(chat?.roomName === roomName) {
+            chatHistory.push(chat)
+        }
+    })
+
+    if(chatHistory.length > 0){
+        return {status: true, chatHistory: chatHistory}
+    }
+
+    return {status: false, chatHistory:chatHistory, message: `no chats found for room ${roomName}`}
+
 }
 
 

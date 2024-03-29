@@ -27,7 +27,7 @@ function ChatRoom({ userName, senderName, setUserName }) {
   // emit for joining and sending your data
   useEffect(() => {
     joinEmit();
-    console.log("user joined:", userName);
+    // console.log("user joined:", userName);
   }, [userName]);
 
   // user joining emit on page load
@@ -62,7 +62,7 @@ function ChatRoom({ userName, senderName, setUserName }) {
     // Setup event listener for incoming messages
     socket.on("newMessage", (data) => {
       setMessages([...messages, data]);
-      console.log("new message", data);
+      // console.log("new message", data);
     });
 
     // Cleanup the event listener when the component unmounts
@@ -89,14 +89,16 @@ function ChatRoom({ userName, senderName, setUserName }) {
     users.forEach((e) => {
       roomName += e
     })
-    console.log(`joining ${roomName} `);
-    socket.emit("joinRoom", {roomTitle, roomName,users, roomType}, (data) => {
-      console.log(data)
-      if (data?.status) {
+    
+    socket.emit("joinRoom", {roomTitle, roomName,users, roomType}, (res) => {
+
+      console.log(res)
+
+      if (res?.status) {
         // if room type is oneToOne then roomTitle will be of the other name out of 2 in that array
-        if(data?.room?.roomType === 'oneToOne'){
-          let roomTitleArr = data?.room?.roomTitle
-          console.log(roomTitleArr)
+        if(res?.roomData?.room?.roomType === 'oneToOne'){
+          let roomTitleArr = res?.roomData?.room?.roomTitle
+          // console.log(roomTitleArr)
           let idx = roomTitleArr?.findIndex((name) => name === senderName)
           // i am finding idx to be equal to 0 in one case but it is not slicing down
           if(idx >= 0){
@@ -106,9 +108,9 @@ function ChatRoom({ userName, senderName, setUserName }) {
           } 
         } else {  
           // if roomType is not one to one , then obviously it will be group or comminity in which only admin can enter name of the same, so no issues in using 
-          data?.room?.roomTitle[0]
+          res?.roomData?.room?.roomTitle[0]
         }
-        console.log(data?.room)
+        // console.log(data?.room)
       } else {
         console.log("user already in the room");
       }
@@ -120,6 +122,7 @@ function ChatRoom({ userName, senderName, setUserName }) {
     localStorage.removeItem("userName");
     setUserName("");
     window.location.href = "/";
+    socket.emit("disconnect")
   };
 
   return (

@@ -1,8 +1,19 @@
+import { getRoomChatHistory } from "./chats.js";
+
 let rooms = [];
 
+//  add room in socket
 export const addRoom = (roomTitle, roomName, users, roomType, admins = []) => {
   let idx = rooms.findIndex((r) => r.roomName === roomName);
-  console.log(idx)
+  console.log(idx);
+
+   // getting chatHistory, if any
+   const chatHistory = getRoomChatHistory(roomName);
+
+   if (!chatHistory?.status) {
+     console.error(chatHistory?.message);
+   }
+
   if (idx < 0) {
     let roomData = {
       roomTitle: roomTitle,
@@ -12,14 +23,16 @@ export const addRoom = (roomTitle, roomName, users, roomType, admins = []) => {
       admins: admins,
     };
     rooms.push(roomData);
-    console.log("Rooms=======", rooms)
-    return { status: true, room: roomData };
+
+    // console.log("Rooms=======", rooms)
+    return { status: true, room: roomData, chatData: chatHistory };
   }
-  console.log("existing Rooms=======", rooms)
+  // console.log("existing Rooms=======", rooms)
   //  bruh, if already exits then user is probably changing room
-  return { status: true, room: rooms[idx] };
+  return { status: true, room: rooms[idx], chatData: chatHistory };
 };
 
+// find room in socket
 export const findRoom = (roomName) => {
   let idx = rooms.findIndex((r) => r.roomName === roomName);
   if (idx >= 0) {
@@ -27,14 +40,15 @@ export const findRoom = (roomName) => {
   }
 };
 
+// change room in socket
 export const changeRoom = (socketId, roomName) => {
   let userIdx = rooms.findIndex(
     (user) => user.socketId === socketId && user.roomName !== roomName
   );
   let roomIdx = findRoom(roomName);
   if (userIdx >= 0) {
-    rooms[idx].roomName = roomName;
-    return { status: true, user: rooms[idx] };
+    rooms[roomIdx].roomName = roomName;
+    return { status: true, user: rooms[roomIdx] };
   }
   return { status: false };
 };
