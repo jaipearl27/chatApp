@@ -16,11 +16,11 @@ let chats = []
 
 export const addChat = (userId, userName, roomName, message, reactions=[],readBy=[]) => {
     
-    let chat = {userId: userId,userName:userName, roomName:roomName, message:message, reactions:reactions, readBy:readBy, timestamp: new Date() }
+    let newMessage = {userId: userId,userName:userName, roomName:roomName, message:message, reactions:reactions, readBy:readBy, timestamp: new Date() }
 
-    chats.push(chat)
+    chats.push(newMessage)
 
-    return {status: true, message: message}
+    return {status: true, messageData: newMessage}
 
 }
 

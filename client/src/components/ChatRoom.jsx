@@ -58,22 +58,18 @@ function ChatRoom({ userName, senderName, setUserName }) {
     });
   }, []);
 
-  useEffect(() => {
-    // Setup event listener for incoming messages
-    socket.on("newMessage", (data) => {
-      setMessages([...messages, data]);
-      // console.log("new message", data);
-    });
 
-    // Cleanup the event listener when the component unmounts
-    return () => {
-      socket.off("newMessage");
-    };
-  }, [messages]); // Only re-run this effect if messages change
+  // socket.on("newMessage", (data) => {
+  //   console.log('new message', data)
+  //   setMessages([...messages, data]);
+  //   // console.log("new message", data);
+  // });
+
 
   const handleMessageSend = () => {
     if (messageInput.length > 0) {
       socket.emit("message", {
+        userId: 1, //sample userId, update with mongoDB id in future
         userName: userName,
         message: messageInput.trim(),
       });

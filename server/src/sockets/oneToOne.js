@@ -6,6 +6,7 @@ import {
   removeUser,
 } from "../../src/utils/users.js";
 import { addRoom, changeRoom } from "../utils/rooms.js";
+import { addChat } from "../utils/chats.js";
 
 export function configureOneToOneNamespace(server) {
   const io = new Server(server, {
@@ -68,17 +69,17 @@ export function configureOneToOneNamespace(server) {
     //on message
     socket.on("message", (data) => {
       const user = findUser(socket.id);
+      console.log(user)
       const messageData = addChat(
-        data?.userId,
-        data?.userName,
-        data?.roomName,
+        data?.userId, // update this with mongoDB id in future
+        user?.userName,
+        user?.roomName,
         data?.message
       );
+      console.log(messageData)
       if (messageData?.status) {
-        socket.emit("newMessage", messageData?.message);
-        socket.broadcast
-          .to(user?.roomName)
-          .emit("newMessage", messageData?.message);
+        socket.emit("newMessage", messageData); // emit to the sender
+        socket.to(user?.roomName).emit("newMessage", messageData);
       }
     });
 
