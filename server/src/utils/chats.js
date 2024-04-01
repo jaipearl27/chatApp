@@ -16,7 +16,13 @@ let chats = []
 
 export const addChat = (userId, userName, roomName, message, reactions=[],readBy=[]) => {
     
-    let newMessage = {userId: userId,userName:userName, roomName:roomName, message:message, reactions:reactions, readBy:readBy, timestamp: new Date() }
+
+        let date = new Date()
+        let dateString = date.toString() 
+        let splitDate = dateString.split(" ")
+        let timestamp = `${splitDate[2]} ${splitDate[1]} ${splitDate[3]} ${splitDate[4]} `
+
+    let newMessage = {userId: userId,userName:userName, roomName:roomName, message:message, reactions:reactions, readBy:readBy, timestamp: timestamp }
 
     chats.push(newMessage)
 

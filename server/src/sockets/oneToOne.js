@@ -76,9 +76,9 @@ export function configureOneToOneNamespace(server) {
         user?.user?.roomName,
         data?.message
       );
-      // console.log(messageData)
+   
       if (messageData?.status) {
-        // console.log('room name' , user?.user?.roomName)
+
         socket.emit("newMessage", messageData); // emit to the sender
         socket.to(user?.user?.roomName).emit("newMessage", messageData);
       }
