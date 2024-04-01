@@ -265,7 +265,11 @@ function ChatRoom({ userName, senderName, setUserName }) {
                 placeholder="Type something here"
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
-                onKeyDown={handleMessageSend}
+                onKeyDown={(e) => {
+                  if(e.key === "Enter") {
+                    handleMessageSend
+                  }
+                }}
                 ref={messageInputRef}
               />
               <button
