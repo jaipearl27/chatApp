@@ -69,17 +69,18 @@ export function configureOneToOneNamespace(server) {
     //on message
     socket.on("message", (data) => {
       const user = findUser(socket.id);
-      console.log(user)
+      console.log('user', user)
       const messageData = addChat(
         data?.userId, // update this with mongoDB id in future
-        user?.userName,
-        user?.roomName,
+        user?.user?.userName,
+        user?.user?.roomName,
         data?.message
       );
-      console.log(messageData)
+      // console.log(messageData)
       if (messageData?.status) {
+        // console.log('room name' , user?.user?.roomName)
         socket.emit("newMessage", messageData); // emit to the sender
-        socket.to(user?.roomName).emit("newMessage", messageData);
+        socket.to(user?.user?.roomName).emit("newMessage", messageData);
       }
     });
 

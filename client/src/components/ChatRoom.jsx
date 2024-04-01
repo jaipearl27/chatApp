@@ -58,16 +58,16 @@ function ChatRoom({ userName, senderName, setUserName }) {
     });
   }, []);
 
-
-  // socket.on("newMessage", (data) => {
-  //   console.log('new message', data)
-  //   setMessages([...messages, data]);
-  //   // console.log("new message", data);
-  // });
+  socket.on("newMessage", (data) => {
+    console.log('new message', data?.messageData)
+    setMessages([...messages, data?.messageData]);
+    // console.log("new message", data);
+  });
 
 
   const handleMessageSend = () => {
     if (messageInput.length > 0) {
+      console.log('emitting message')
       socket.emit("message", {
         userId: 1, //sample userId, update with mongoDB id in future
         userName: userName,
@@ -87,10 +87,13 @@ function ChatRoom({ userName, senderName, setUserName }) {
     })
     
     socket.emit("joinRoom", {roomTitle, roomName,users, roomType}, (res) => {
-
-      console.log(res)
-
+    console.log(res?.roomData?.chatData?.chatHistory[0])
       if (res?.status) {
+      // fill chat history when joining room
+
+      setMessages(res?.roomData?.chatData?.chatHistory)
+
+
         // if room type is oneToOne then roomTitle will be of the other name out of 2 in that array
         if(res?.roomData?.room?.roomType === 'oneToOne'){
           let roomTitleArr = res?.roomData?.room?.roomTitle
