@@ -67,20 +67,23 @@ export function configureOneToOneNamespace(server) {
     });
 
     //on message
-    socket.on("message", (data) => {
-      const user = findUser(socket.id);
-      console.log('user', user)
-      const messageData = addChat(
-        data?.userId, // update this with mongoDB id in future
-        user?.user?.userName,
-        user?.user?.roomName,
-        data?.message
-      );
-   
-      if (messageData?.status) {
-
-        socket.emit("newMessage", messageData); // emit to the sender
-        socket.to(user?.user?.roomName).emit("newMessage", messageData);
+    socket.on("message", async (data) => {
+      const user = await findUser(socket.id);
+      // console.log('user', user)
+      if(user){
+        const messageData = await addChat(
+          data?.userId, // update this with mongoDB id in future
+          user?.user?.userName,
+          user?.user?.roomName,
+          data?.message
+        );
+        console.log('emitting new msg', messageData)
+     
+        if (messageData?.status) {
+  
+          socket.emit("newMessage", messageData); // emit to the sender
+          socket.to(user?.user?.roomName).emit("newMessage", messageData);
+        }
       }
     });
 

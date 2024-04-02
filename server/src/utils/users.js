@@ -25,9 +25,9 @@ export const removeUser = (socketId) => {
 
 // find user as per socket id
 
-export const findUser = (socketId) => {
+export const findUser = async (socketId) => {
   console.log(users)
-  console.log('socket id in find User', socketId)
+  // console.log('socket id in find User', socketId)
   let idx = users.findIndex((user) => user.socketId === socketId);
   if(idx >= 0){
     return {status: true, user: users[idx]}

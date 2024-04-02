@@ -9,14 +9,17 @@ import { FaRegThumbsUp } from "react-icons/fa";
 
 import UserList from "./UserList";
 
-const socket = io(import.meta.env.VITE_SOCKET_ONETOONE);
-
 function ChatRoom({ userName, senderName, setUserName }) {
   // states
+
+  const [socket, setSocket] = useState(null);
+
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
   const [users, setUsers] = useState([]);
   const [room, setRoom] = useState("");
+  const [roomId, setRoomId] = useState("");
+
   const [isJoined, setIsJoined] = useState(false); // Track whether join event is emitted
 
   const [dateOptions, setDateOptions] = useState({
@@ -31,7 +34,7 @@ function ChatRoom({ userName, senderName, setUserName }) {
 
   // user joining emit on page load
   const joinEmit = () => {
-    if (!isJoined) {
+    if (!isJoined && socket) {
       socket.emit("join", userName);
       setIsJoined(true);
       // setRoom(userName);
@@ -39,25 +42,37 @@ function ChatRoom({ userName, senderName, setUserName }) {
   };
 
   const leaveEmit = () => {
-    if (isJoined) {
+    if (isJoined && socket) {
       socket.emit("leaving", userName);
       setIsJoined(false);
     }
   };
 
-  // socket.on for getting users data on join
-  socket.on("users", (users) => {
-    setUsers(users);
-  });
-
-  socket.on("newMessage", (data) => {
-    console.log("new message", data?.messageData);
-    setMessages([...messages, data?.messageData]);
-    // console.log("new message", data);
-  });
-
+  useEffect(() => {
+    if (socket === null) {
+      setSocket(io(import.meta.env.VITE_SOCKET_ONETOONE));
+    }
+    if(socket){
+      socket.on("users", (users) => {
+        setUsers(users);
+      });
+  
+      const handleNewMessage = (data) => {
+        console.log(messages);
+        console.log("new message", data?.messageData);
+        setMessages(prevMessages => [...prevMessages, data?.messageData]);
+      };
+  
+      socket.on("newMessage", handleNewMessage);
+  
+      return () => {
+        socket.off("newMessage", handleNewMessage);
+      };
+    }
+  }, [socket]);
+  
   const handleMessageSend = () => {
-    if (messageInput.length > 0) {
+    if (messageInput.length > 0 && socket) {
       console.log("emitting message");
       socket.emit("message", {
         userId: 1, //sample userId, update with mongoDB id in future
@@ -75,34 +90,36 @@ function ChatRoom({ userName, senderName, setUserName }) {
     users.forEach((e) => {
       roomName += e;
     });
-
-    socket.emit("joinRoom", { roomTitle, roomName, users, roomType }, (res) => {
-      console.log(res?.roomData?.chatData?.chatHistory[0]);
-      if (res?.status) {
-        // fill chat history when joining room
-
-        setMessages(res?.roomData?.chatData?.chatHistory);
-
-        // if room type is oneToOne then roomTitle will be of the other name out of 2 in that array
-        if (res?.roomData?.room?.roomType === "oneToOne") {
-          let roomTitleArr = res?.roomData?.room?.roomTitle;
-          // console.log(roomTitleArr)
-          let idx = roomTitleArr?.findIndex((name) => name === senderName);
-          // i am finding idx to be equal to 0 in one case but it is not slicing down
-          if (idx >= 0) {
-            roomTitleArr.splice(idx, 1);
-
-            setRoom(roomTitleArr[0]);
+    if(socket){
+      socket.emit("joinRoom", { roomTitle, roomName, users, roomType }, (res) => {
+        console.log(res?.roomData?.chatData?.chatHistory[0]);
+        if (res?.status) {
+          // fill chat history when joining room
+          // console.log(res?.roomData)
+  
+          setMessages(res?.roomData?.chatData?.chatHistory);
+  
+          // if room type is oneToOne then roomTitle will be of the other name out of 2 in that array
+          if (res?.roomData?.room?.roomType === "oneToOne") {
+            let roomTitleArr = res?.roomData?.room?.roomTitle;
+            // console.log(roomTitleArr)
+            let idx = roomTitleArr?.findIndex((name) => name === senderName);
+            // i am finding idx to be equal to 0 in one case but it is not slicing down
+            if (idx >= 0) {
+              roomTitleArr.splice(idx, 1);
+              setRoomId(res?.roomData?.room?.roomName)
+              setRoom(roomTitleArr[0]);
+            }
+          } else {
+            // if roomType is not one to one , then obviously it will be group or comminity in which only admin can enter name of the same, so no issues in using
+            res?.roomData?.room?.roomTitle[0];
           }
+          // console.log(data?.room)
         } else {
-          // if roomType is not one to one , then obviously it will be group or comminity in which only admin can enter name of the same, so no issues in using
-          res?.roomData?.room?.roomTitle[0];
+          console.log("user already in the room");
         }
-        // console.log(data?.room)
-      } else {
-        console.log("user already in the room");
-      }
-    });
+      });
+    }
     // console.log('emitting Join Room')
   };
 
@@ -115,23 +132,25 @@ function ChatRoom({ userName, senderName, setUserName }) {
 
   // socket.on for receiving messages
   useEffect(() => {
-    socket.on("messages", (messages) => {
-      setMessages(messages);
-    });
-  }, []);
+    if(socket){
+      socket.on("messages", (messages) => {
+        setMessages(messages);
+      });
+    }
+  }, [socket]);
 
   // emit for joining and sending your data
   useEffect(() => {
     joinEmit();
     // console.log("user joined:", userName);
-  }, [userName]);
+  }, [userName, socket]);
 
- useEffect(() => {
-  const chatBox = chatBoxRef.current;
-  if (chatBox) {
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-}, [messages, chatBoxRef]);
+  useEffect(() => {
+    const chatBox = chatBoxRef.current;
+    if (chatBox) {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  }, [messages, chatBoxRef]);
 
   return (
     <>
@@ -143,6 +162,8 @@ function ChatRoom({ userName, senderName, setUserName }) {
       </button>
       <div className="w-full text-2xl text-center">
         Current User: {userName}
+        <br />
+        Current Room : {roomId}
       </div>
       <div
         className={` w-[98%] md:w-[800px] flex flex-row mx-auto mt-2 border border-gray-400 rounded-lg`}
@@ -266,8 +287,8 @@ function ChatRoom({ userName, senderName, setUserName }) {
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 onKeyDown={(e) => {
-                  if(e.key === "Enter") {
-                    handleMessageSend
+                  if (e.key === "Enter") {
+                    handleMessageSend;
                   }
                 }}
                 ref={messageInputRef}

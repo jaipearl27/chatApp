@@ -1,6 +1,6 @@
-import { addMessage } from "../controllers/messageController.js"
+import { addMessage } from "../controllers/messageController.js";
 
-let chats = []
+let chats = [];
 
 // _id - id for the message that MongoDB creted after saving it in the DB
 
@@ -14,38 +14,50 @@ let chats = []
 
 //reactions - [{'userId','userName', 'reaction'}]
 
-export const addChat = (userId, userName, roomName, message, reactions=[],readBy=[]) => {
-    
+export const addChat = async (
+  userId,
+  userName,
+  roomName,
+  message,
+  reactions = [],
+  readBy = []
+) => {
+  let date = new Date();
+  let dateString = date.toString();
+  let splitDate = dateString.split(" ");
+  let timestamp = `${splitDate[2]} ${splitDate[1]} ${splitDate[3]} ${splitDate[4]} `;
 
-        let date = new Date()
-        let dateString = date.toString() 
-        let splitDate = dateString.split(" ")
-        let timestamp = `${splitDate[2]} ${splitDate[1]} ${splitDate[3]} ${splitDate[4]} `
+  let newMessage = {
+    userId: userId,
+    userName: userName,
+    roomName: roomName,
+    message: message,
+    reactions: reactions,
+    readBy: readBy,
+    timestamp: timestamp,
+  };
 
-    let newMessage = {userId: userId,userName:userName, roomName:roomName, message:message, reactions:reactions, readBy:readBy, timestamp: timestamp }
+  chats.push(newMessage);
 
-    chats.push(newMessage)
-
-    return {status: true, messageData: newMessage}
-
-}
-
+  return { status: true, messageData: newMessage };
+};
 
 export const getRoomChatHistory = (roomName) => {
-    let chatHistory = []
+  let chatHistory = [];
 
-    chats.forEach((chat) => {
-        if(chat?.roomName === roomName) {
-            chatHistory.push(chat)
-        }
-    })
-
-    if(chatHistory.length > 0){
-        return {status: true, chatHistory: chatHistory}
+  chats.forEach((chat) => {
+    if (chat?.roomName === roomName) {
+      chatHistory.push(chat);
     }
+  });
 
-    return {status: false, chatHistory:chatHistory, message: `no chats found for room ${roomName}`}
+  if (chatHistory.length > 0) {
+    return { status: true, chatHistory: chatHistory };
+  }
 
-}
-
-
+  return {
+    status: false,
+    chatHistory: chatHistory,
+    message: `no chats found for room ${roomName}`,
+  };
+};
