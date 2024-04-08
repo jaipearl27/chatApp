@@ -59,8 +59,8 @@ const UserList = ({ myChats, setUsers, userName, joinRoom, senderName}) => {
 
   return (
     <div 
-      className="w-2/6 text-white flex flex-col gap-3"
-      style={{borderRight: '1px solid #9ca3af'}}
+      className="w-[300px] text-white flex flex-col gap-3"
+      style={{borderRight: '1px solid rgb(156, 163, 175) '}}
     >
       {/* search input */}
       <div className="flex flex-col gap-1">
@@ -79,7 +79,7 @@ const UserList = ({ myChats, setUsers, userName, joinRoom, senderName}) => {
           />
         </div>
         {searchInput.length > 0 && (
-          <div className="w-[95%] mx-auto flex flex-col bg-gray-100 shadow-lg transition duration-300 border border-gray-400 rounded-sm max-h-[400px] overflow-y-auto">
+          <div className="w-[95%] mx-auto flex flex-col bg-gray-100 shadow-lg transition duration-300 border  border-gray-400 rounded-sm max-h-[400px] overflow-y-auto">
             {isLoading ? (
               <div className="w-full flex justify-center py-1">
                 <MagnifyingGlass
