@@ -14,6 +14,7 @@ import Picker from "@emoji-mart/react";
 
 import { IoCloseOutline } from "react-icons/io5";
 import AppSvgs from "./AppSvgs";
+import Thread from "./Thread";
 
 function ChatRoom({ userName, senderName, setUserName }) {
   // states
@@ -22,6 +23,8 @@ function ChatRoom({ userName, senderName, setUserName }) {
 
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
+  const [threadMessages, setThreadMessages] = useState([]);
+  const [threadMessageInput, setThreadMessageInput] = useState("");
   const [users, setUsers] = useState([]);
   const [room, setRoom] = useState("");
   const [roomId, setRoomId] = useState("");
@@ -36,10 +39,11 @@ function ChatRoom({ userName, senderName, setUserName }) {
 
   const [selectedMessageIndex, setSelectedMessageIndex] = useState(null);
 
-  const [replyTo, setReplyTo] = useState(null)
+  const [replyTo, setReplyTo] = useState(null);
 
   // refs
   const messageInputRef = useRef();
+  const threadMessageInputRef = useRef();
   const chatBoxRef = useRef();
 
   // user joining emit on page load
@@ -85,6 +89,19 @@ function ChatRoom({ userName, senderName, setUserName }) {
     if (messageInput.length > 0 && socket) {
       console.log("emitting message");
       socket.emit("message", {
+        userId: 1, //sample userId, update with mongoDB id in future
+        userName: userName,
+        message: messageInput.trim(),
+      });
+      setMessageInput("");
+      messageInputRef.current.focus();
+    }
+  };
+
+  const handleThreadMessageSend = () => {
+    if (messageInput.length > 0 && socket) {
+      console.log("emitting thread reply message");
+      socket.emit("threadMessage", {
         userId: 1, //sample userId, update with mongoDB id in future
         userName: userName,
         message: messageInput.trim(),
@@ -173,6 +190,14 @@ function ChatRoom({ userName, senderName, setUserName }) {
     }
     setSelectedMessageIndex(idx);
   };
+
+  // const selectMessage = (idx) => {
+  //   if (idx === selectedMessageIndex) {
+  //     setSelectedMessageIndex(null);
+  //     return;
+  //   }
+  //   setSelectedMessageIndex(idx);
+  // };
 
   return (
     <div>
@@ -289,10 +314,12 @@ function ChatRoom({ userName, senderName, setUserName }) {
                                 </div>
                                 <div className="flex flex-col">
                                   {/* reply */}
-                                  <div className="flex flex-col justify-center rounded-full cursor-pointer hover:scale-110 transition duration-300 w-fit" title="Reply"
+                                  <div
+                                    className="flex flex-col justify-center rounded-full cursor-pointer hover:scale-110 transition duration-300 w-fit"
+                                    title="Reply"
                                     onClick={() => {
-                                      setReplyTo(message)
-                                      console.log("opening thread")
+                                      setReplyTo(message);
+                                      console.log("opening thread");
                                     }}
                                   >
                                     <IoReturnUpBackOutline size={18} />
@@ -315,31 +342,37 @@ function ChatRoom({ userName, senderName, setUserName }) {
                   ))}
               </div>
               {/* chat input */}
-              <div className="flex gap-2 border-t border-gray-300 p-2">
-                <div className="relative w-full">
-                  <div className="absolute right-2 flex flex-col justify-center h-full">
-                    <GrAttachment
-                      className="text-black z-[1] cursor-pointer"
-                      size={20}
-                      onClick={(e) => {
-                        e.stopPropagation;
+              <div className="flex gap-2 border-t border-gray-300 p-2 max-h-[300px]">
+                <div className="w-full h-full">
+                  <div className="relative flex flex-row border border-gray-200 bg-[#ececff] h-full">
+                    <textarea
+                      type="text"
+                      className="w-[90%] h-auto max-h-[300px] text-center p-1 bg-[#ececff] rounded-md"
+                      placeholder="Enter your message"
+                      value={messageInput}
+                      onChange={(e) => setMessageInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleMessageSend;
+                        }
                       }}
+                      ref={messageInputRef}
                     />
+                    <div className="flex gap-1 w-[10%] justify-around">
+                      <div className="flex flex-col justify-center h-full">
+                        <AppSvgs name="addEmoji" />
+                      </div>
+                      <div className="flex flex-col justify-center h-full">
+                        <GrAttachment
+                          className="text-black z-[1] cursor-pointer"
+                          size={20}
+                          onClick={(e) => {
+                            e.stopPropagation;
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
-
-                  <input
-                    type="text"
-                    className="w-full h-full text-center p-1 border border-gray-200 bg-[#ececff] rounded-md"
-                    placeholder="Type something here"
-                    value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleMessageSend;
-                      }
-                    }}
-                    ref={messageInputRef}
-                  />
                 </div>
                 <button
                   type="button"
@@ -353,89 +386,16 @@ function ChatRoom({ userName, senderName, setUserName }) {
 
             {/* chat thread */}
             {replyTo && (
-                <div className="w-[500px] flex flex-col ">
-                  <div className="relative w-full border border-l-0 border-t-0 border-gray-300 text-black min-h-[50px] flex flex-col justify-center text-base py-2 px-4">
-                    <div className="flex flex-row justify-between gap-2 ">
-                      <div className="text-black flex flex-col justify-center">
-                        <div className="font-medium text-black">Thread</div>
-                      </div>
-                      <IoCloseOutline size={24} className="cursor-pointer" onClick={() => setReplyTo(null)} />
-                    </div>
-                  </div>
-                  <div className="h-[90%]">
-                    <div>
-                    <div className="flex flex-col justify-center">
-                          {/* message left */}
-                          <div className="w-full flex px-3">
-                            <div className="flex flex-col gap-2 text-left relative max-w-[80%]">
-                              <small className="text-[10px]">
-                                {replyTo?.timestamp}
-                              </small>
-                              <div className="flex flex-row gap-2 relative">
-                                <img
-                                  src="/noProfilePic.webp"
-                                  alt="no profile pic"
-                                  className="w-[25px] h-[25px] rounded-full relative"
-                                />
-
-                                <div
-                                  className="bg-[#ececff] text-gray-700 border border-gray-300 px-3 py-1 shadow-xs text-wrap break-words h-fit"
-                                  style={{ borderRadius: "0 12px 12px 12px" }}
-                                >
-                                  {replyTo?.message}
-                                </div>
-                                <div className="flex flex-col justify-center">
-                                  {/* <div className="flex flex-col justify-center rounded-full cursor-pointer hover:scale-110 transition duration-300 w-fit">
-                                    <IoReturnUpBackOutline size={18} />
-                                  </div> */}
-
-                                  <div
-                                    className="flex flex-col justify-center rounded-full cursor-pointer hover:scale-110 transition duration-300 w-fit relative"
-                                    onClick={() => selectMessage(idx)}
-                                  >
-                                    <AppSvgs name="addEmoji" />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                    </div>
-                  </div>
-                  {/* chat input */}
-                  <div className="flex gap-2 border-t border-gray-300 p-2">
-                    <div className="relative w-full">
-                      <div className="absolute right-2 flex flex-col justify-center h-full">
-                        <GrAttachment
-                    className="text-black"
-                    size={20}
-                  />
-                      </div>
-
-                      <input
-                        type="text"
-                        className="w-full h-full text-center p-1 border border-gray-200 bg-[#ececff] rounded-md"
-                        placeholder="Type something here"
-                        value={messageInput}
-                        onChange={(e) => setMessageInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleMessageSend;
-                          }
-                        }}
-                        ref={messageInputRef}
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      className="w-fit p-1 rounded-md bg-[#00116c] hover:bg-[#000b41] text-white"
-                      onClick={handleMessageSend}
-                    >
-                      <BsSend size="40" />
-                    </button>
-                  </div>
-                </div>
-              )}
+              <Thread
+                replyTo={replyTo}
+                setReplyTo={setReplyTo}
+                handleThreadMessageSend={handleThreadMessageSend}
+                threadMessageInput={threadMessageInput}
+                setThreadMessageInput={setThreadMessageInput}
+                threadMessageInputRef={threadMessageInputRef}
+                threadMessages={threadMessages}
+              />
+            )}
           </div>
         ) : (
           <div className="w-full h-[80vh] bg-white flex flex-col justify-center text-center text-2xl font-medium rounded">
