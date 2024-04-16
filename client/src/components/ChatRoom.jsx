@@ -5,7 +5,6 @@ import { io } from "socket.io-client";
 import { BsSend } from "react-icons/bs";
 import { GrAttachment } from "react-icons/gr";
 import { IoReturnUpBackOutline } from "react-icons/io5";
-import { FaRegThumbsUp } from "react-icons/fa";
 
 import UserList from "./UserList";
 
@@ -25,7 +24,7 @@ function ChatRoom({ userName, senderName, setUserName }) {
   const [messageInput, setMessageInput] = useState("");
   const [threadMessages, setThreadMessages] = useState([]);
   const [threadMessageInput, setThreadMessageInput] = useState("");
-  const [users, setUsers] = useState([]);
+  const [usersList, setUsersList] = useState([]);
   const [room, setRoom] = useState("");
   const [roomId, setRoomId] = useState("");
 
@@ -67,8 +66,8 @@ function ChatRoom({ userName, senderName, setUserName }) {
       setSocket(io(import.meta.env.VITE_SOCKET_ONETOONE));
     }
     if (socket) {
-      socket.on("users", (users) => {
-        setUsers(users);
+      socket.on("usersList", (data) => {
+        setUsersList(data);
       });
 
       const handleNewMessage = (data) => {
@@ -223,8 +222,8 @@ function ChatRoom({ userName, senderName, setUserName }) {
         className={`w-[98%] md:w-[90vw] max-w-[1200px] flex flex-row mx-auto mt-2 border border-gray-300 rounded`}
       >
         <UserList
-          users={users}
-          setUsers={setUsers}
+          usersList={usersList}
+          setUsersList={setUsersList}
           userName={userName}
           joinRoom={joinRoom}
           senderName={senderName}
@@ -408,3 +407,6 @@ function ChatRoom({ userName, senderName, setUserName }) {
 }
 
 export default ChatRoom;
+
+
+

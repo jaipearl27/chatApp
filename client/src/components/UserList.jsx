@@ -4,14 +4,11 @@ import { IoIosArrowForward } from "react-icons/io"
 import axios from "axios";
 import { MagnifyingGlass } from "react-loader-spinner";
 
-const UserList = ({ myChats, setUsers, userName, joinRoom, senderName}) => {
+const UserList = ({ myChats,usersList, setUsersList, userName, joinRoom, senderName}) => {
   const [searchInput, setSearchInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchedUsers, setSearchedUsers] = useState([]);
   const [activeUsers, setActiveUsers] = useState([])
-
-
-
 
   useEffect(() => {
     if (searchInput.length <= 0) {

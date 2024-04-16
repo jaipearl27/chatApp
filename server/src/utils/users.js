@@ -61,8 +61,13 @@ export const enterRoom = (socketId, roomName) => {
   if(idx < 0){
     return {status: false, user:[], message: 'No user found joined in socket'}
   }
-  console.log('roomName is =>', roomName)
-  users[idx].roomName = roomName
+  
+  let previousRoom = users[idx]?.roomName
+
+  if(previousRoom?.length > 0) {
+    users[idx].roomName = roomName
+    return {status: true,  previousRoom: previousRoom, user:users[idx],message: `User joined room ${roomName}`}
+  }
 
   return {status: true,  user:users[idx],message: `User joined room ${roomName}`}
 }

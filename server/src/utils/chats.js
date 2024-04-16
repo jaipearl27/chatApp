@@ -15,31 +15,29 @@ let chats = [];
 //reactions - [{'userId','userName', 'reaction'}]
 
 export const addChat = async (
-  userId,
-  userName,
-  roomName,
-  message,
-  reactions = [],
-  readBy = []
+  data
 ) => {
-  let date = new Date();
-  let dateString = date.toString();
-  let splitDate = dateString.split(" ");
-  let timestamp = `${splitDate[2]} ${splitDate[1]} ${splitDate[3]} ${splitDate[4]} `;
+  
 
   let newMessage = {
-    userId: userId,
-    userName: userName,
-    roomName: roomName,
-    message: message,
-    reactions: reactions,
-    readBy: readBy,
-    timestamp: timestamp,
+    userId: data?.userId,
+    userName: data?.userName,
+    roomName: data?.roomName,
+    message: data?.message,
+    reactions: data?.reactions,
+    readBy: data?.readBy,
+    timestamp: data?.timestamp,
   };
 
   chats.push(newMessage);
-
-  return { status: true, messageData: newMessage };
+  
+  const messageData = await addMessage(newMessage)
+  
+  if(messageData?.status) {
+    return { status: true, messageData: messageData };
+  } else {
+    return { status: false, message: 'Error sending message' };
+  }
 };
 
 export const getRoomChatHistory = (roomName) => {

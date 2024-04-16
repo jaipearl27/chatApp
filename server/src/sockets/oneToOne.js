@@ -20,8 +20,8 @@ export function configureOneToOneNamespace(server) {
   oneToOneNamespace.on("connection", (socket) => {
     // user joins
     console.log(`user with ${socket.id} joined`);
-
     socket.on("join", async (userName, adminid) => {
+
       const newUser = {
         userName: userName,
         socketId: socket.id,
@@ -29,7 +29,6 @@ export function configureOneToOneNamespace(server) {
       };
 
       // user added to socket
-
       const result = addUser(newUser);
 
       if (adminid === process.env.ADMINID) {
@@ -50,17 +49,17 @@ export function configureOneToOneNamespace(server) {
     // on room join
     socket.on("joinRoom", ({ roomTitle, roomName, users, roomType }, cb) => {
       const result = addRoom(roomTitle, roomName, users, roomType);
-      
-    console.log(result)
+      // console.log(result);
       if (result?.status) {
         const userData = enterRoom(socket.id, result?.room?.roomName);
-        // console.log(userData)
+        if(userData?.previousRoom){
+          socket.leave(userData?.previousRoom)
+        }
         socket.join(userData?.user?.roomName);
-
         cb({
           status: true,
           userData: userData,
-          roomData: result
+          roomData: result,
         });
       }
       cb({ status: false });
@@ -69,20 +68,31 @@ export function configureOneToOneNamespace(server) {
     //on message
     socket.on("message", async (data) => {
       const user = await findUser(socket.id);
-      // console.log('user', user)
-      if(user){
-        const messageData = await addChat(
-          data?.userId, // update this with mongoDB id in future
-          user?.user?.userName,
-          user?.user?.roomName,
-          data?.message
-        );
-        console.log('emitting new msg', messageData)
-     
-        if (messageData?.status) {
-  
-          socket.emit("newMessage", messageData); // emit to the sender
-          socket.to(user?.user?.roomName).emit("newMessage", messageData);
+
+      if (user) {
+        
+        let date = new Date();
+        let dateString = date.toString();
+        let splitDate = dateString.split(" ");
+        let timestamp = `${splitDate[2]} ${splitDate[1]} ${splitDate[3]} ${splitDate[4]}`;
+
+        const messageData = {
+          userId: data?.userId,
+          userName: user?.user?.userName,
+          roomName: user.user?.roomName,
+          message: data?.message,
+          timestamp: timestamp,
+          reactions: [],
+          readBy: [{userId: data?.userId, userName: user?.user?.userName}],        
+        }
+
+        socket.emit("newMessage", messageData); // emit to the sender
+
+        const messageDataResult = await addChat(messageData);
+
+
+        if (messageDataResult?.status) {
+          socket.to(user?.user?.roomName).emit("newMessage", messageDataResult);
         }
       }
     });
@@ -91,7 +101,6 @@ export function configureOneToOneNamespace(server) {
     socket.on("disconnect", () => {
       const result = removeUser(socket.id);
       if (result.status) io.emit("users", result.users);
-      // console.log(`user with id ${socket.id} left`);
     });
   });
 
