@@ -7,6 +7,7 @@ import {
 } from "../../src/utils/users.js";
 import { addRoom, changeRoom } from "../utils/rooms.js";
 import { addChat } from "../utils/chats.js";
+import { getChatHistory } from "../controllers/messageController.js";
 
 export function configureOneToOneNamespace(server) {
   const io = new Server(server, {
@@ -22,6 +23,8 @@ export function configureOneToOneNamespace(server) {
     console.log(`user with ${socket.id} joined`);
     socket.on("join", async (userName, adminid) => {
 
+      const chatHistory = await getChatHistory(userName)
+
       const newUser = {
         userName: userName,
         socketId: socket.id,
@@ -34,16 +37,11 @@ export function configureOneToOneNamespace(server) {
       if (adminid === process.env.ADMINID) {
         socket.emit("users", result.users);
       }
+      console.log(chatHistory)
 
-      // socket.emit('newMessage', {userName: result?.user?.userName, message: `Welcome to the room ${userName}`})
-
-      // socket.broadcast.to(userName).emit('newMessge', {userName: result?.user?.userName, message: `${userName} just joined the room`} )
-
-      // Emit user count to all users if the user is new
-
-      // if (result.status) {
-      //   io.emit("users", result.users);
-      // }
+      if(chatHistory?.status) {
+        socket.emit("chatHistory", chatHistory)
+      }
     });
 
     // on room join

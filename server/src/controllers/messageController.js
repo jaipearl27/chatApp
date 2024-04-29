@@ -23,12 +23,33 @@ export const getAllMessages = async (roomId) => {
   } catch (error) {
     console.log(error);
     const response = {
-        data: [],
-        status: false,
-        message: error?.message,
-      }
+      data: [],
+      status: false,
+      message: error?.message,
+    };
     return response;
   }
+};
+
+export const getChatHistory = async (userName) => {
+  // Define the pipeline for aggregation
+  const pipeline = [
+    {
+      $match: { userName: userName },
+    },
+    {
+      $group: {
+        _id: "$roomName",
+        messages: { $push: "$$ROOT" },
+      },
+    },
+  ];
+
+  const chatHistory = await messageModel.aggregate(pipeline).catch((error) => {
+    console.error(error.message);
+  });
+
+  return { status: true, chatHistory: chatHistory };
 };
 
 export const addMessage = async (newMessage) => {
@@ -40,18 +61,17 @@ export const addMessage = async (newMessage) => {
       message: newMessage.message,
       readBy: newMessage.readBy,
       reactions: newMessage.reactions,
-      timestamp: newMessage.timestamp
-    }
+      timestamp: newMessage.timestamp,
+    };
 
-    const messageData =  messageModel(data);
+    const messageData = messageModel(data);
     const result = await messageData.save();
 
-    console.log('message added', result)
-    if(result){
-      return {status: true, data: data}
-    } 
-    return {status: false, data: null}
-
+    console.log("message added", result);
+    if (result) {
+      return { status: true, data: data };
+    }
+    return { status: false, data: null };
   } catch (error) {
     console.log(error);
     const response = {
@@ -63,7 +83,6 @@ export const addMessage = async (newMessage) => {
   }
 };
 
-
 export const updateReadReceipt = async (roomId, userId, userName, message) => {
   try {
     const data = {
@@ -71,15 +90,14 @@ export const updateReadReceipt = async (roomId, userId, userName, message) => {
       userId: userId,
       userName: userName,
       message: message,
-      readBy: [userName]
-    }
+      readBy: [userName],
+    };
     const result = await messageModel.insert(data);
-    console.log('message added', result)
-    if(result){
-      return {status: true, data: data}
-    } 
-    return {status: false, data: null}
-
+    // console.log('message added', result)
+    if (result) {
+      return { status: true, data: data };
+    }
+    return { status: false, data: null };
   } catch (error) {
     console.log(error);
     const response = {

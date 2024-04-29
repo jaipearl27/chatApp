@@ -101,6 +101,6 @@ const messageSchema = new mongoose.Schema(
       trim: true,
     }
   },
-  { timestamps: true }
+  { 0: true }
 );
 export const messageModel = mongoose.model("messages", messageSchema, "messages");

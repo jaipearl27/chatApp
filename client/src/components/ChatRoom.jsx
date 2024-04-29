@@ -71,15 +71,20 @@ function ChatRoom({ userName, senderName, setUserName }) {
       });
 
       const handleNewMessage = (data) => {
-        console.log(messages);
-        console.log("new message", data?.messageData);
-        setMessages((prevMessages) => [...prevMessages, data?.messageData]);
+        // console.log(messages);
+        console.log("new message", data);
+        setMessages((prevMessages) => [...prevMessages, data]);
       };
 
       socket.on("newMessage", handleNewMessage);
 
+      socket.on("chatHistory", (data) => {
+        console.log("chathistory", data)
+      })
+
       return () => {
-        socket.off("newMessage", handleNewMessage);
+        socket.off("newMessage");
+        socket.off("chatHistory")
       };
     }
   }, [socket]);

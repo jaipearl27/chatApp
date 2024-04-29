@@ -26,7 +26,7 @@ export const removeUser = (socketId) => {
 // find user as per socket id
 
 export const findUser = async (socketId) => {
-  console.log(users)
+  // console.log(users)
   // console.log('socket id in find User', socketId)
   let idx = users.findIndex((user) => user.socketId === socketId);
   if(idx >= 0){
@@ -68,7 +68,7 @@ export const enterRoom = (socketId, roomName) => {
     users[idx].roomName = roomName
     return {status: true,  previousRoom: previousRoom, user:users[idx],message: `User joined room ${roomName}`}
   }
-
+  users[idx].roomName = roomName
   return {status: true,  user:users[idx],message: `User joined room ${roomName}`}
 }
 
