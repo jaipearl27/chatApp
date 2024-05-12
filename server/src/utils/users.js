@@ -1,11 +1,11 @@
 let users = [];
 
 // add user data in socket
-export const addUser = ({userName, socketId, roomName}) => {
+export const addUser = ({userName, socketId, room}) => {
   let idx = users.findIndex((ele) => userName === ele.userName);
   
   if (idx < 0) {
-    users.push({userName, socketId, roomName});
+    users.push({userName, socketId, room});
     return { status: true };
   }
   return { status: false, users: users };
@@ -55,21 +55,21 @@ export const getAllActiveUsers = () => {
 
 // enter user in a room
 
-export const enterRoom = (socketId, roomName) => {
+export const enterRoom = (socketId, room) => {
   let idx = users?.findIndex((user) => user?.socketId === socketId)
 
   if(idx < 0){
     return {status: false, user:[], message: 'No user found joined in socket'}
   }
   
-  let previousRoom = users[idx]?.roomName
+  let previousRoom = users[idx]?.room
 
   if(previousRoom?.length > 0) {
-    users[idx].roomName = roomName
-    return {status: true,  previousRoom: previousRoom, user:users[idx],message: `User joined room ${roomName}`}
+    users[idx].room
+    return {status: true,  previousRoom: previousRoom, user:users[idx],message: `User joined room ${room.roomName}`}
   }
-  users[idx].roomName = roomName
-  return {status: true,  user:users[idx],message: `User joined room ${roomName}`}
+  users[idx].room = room
+  return {status: true,  user:users[idx],message: `User joined room ${room.roomName}`}
 }
 
 

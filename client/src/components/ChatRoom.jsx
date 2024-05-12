@@ -15,7 +15,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import AppSvgs from "./AppSvgs";
 import Thread from "./Thread";
 
-function ChatRoom({ userName, senderName, setUserName }) {
+function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
   // states
 
   const [socket, setSocket] = useState(null);
@@ -24,7 +24,7 @@ function ChatRoom({ userName, senderName, setUserName }) {
   const [messageInput, setMessageInput] = useState("");
   const [threadMessages, setThreadMessages] = useState([]);
   const [threadMessageInput, setThreadMessageInput] = useState("");
-  const [usersList, setUsersList] = useState([]);
+  const [chatsList, setChatsList] = useState([]);
   const [room, setRoom] = useState("");
   const [roomId, setRoomId] = useState("");
 
@@ -66,20 +66,16 @@ function ChatRoom({ userName, senderName, setUserName }) {
       setSocket(io(import.meta.env.VITE_SOCKET_ONETOONE));
     }
     if (socket) {
-      socket.on("usersList", (data) => {
-        setUsersList(data);
-      });
-
       const handleNewMessage = (data) => {
-        // console.log(messages);
-        console.log("new message", data);
+        console.log(data)
         setMessages((prevMessages) => [...prevMessages, data]);
       };
 
       socket.on("newMessage", handleNewMessage);
 
       socket.on("chatHistory", (data) => {
-        console.log("chathistory", data)
+        setChatsList(data?.chatHistory)
+        console.log(data)
       })
 
       return () => {
@@ -91,7 +87,6 @@ function ChatRoom({ userName, senderName, setUserName }) {
 
   const handleMessageSend = () => {
     if (messageInput.length > 0 && socket) {
-      console.log("emitting message");
       socket.emit("message", {
         userId: 1, //sample userId, update with mongoDB id in future
         userName: userName,
@@ -126,28 +121,26 @@ function ChatRoom({ userName, senderName, setUserName }) {
         "joinRoom",
         { roomTitle, roomName, users, roomType },
         (res) => {
-          console.log(res?.roomData?.chatData?.chatHistory[0]);
           if (res?.status) {
             // fill chat history when joining room
-
-            setMessages(res?.roomData?.chatData?.chatHistory);
+            setMessages(res?.chatHistory?.chats);
 
             // if room type is oneToOne then roomTitle will be of the other name out of 2 in that array
-            if (res?.roomData?.room?.roomType === "oneToOne") {
-              let roomTitleArr = res?.roomData?.room?.roomTitle;
-              // console.log(roomTitleArr)
+            if (res?.roomData?.roomType === "oneToOne") {
+
+              let roomTitleArr = res?.roomData?.roomTitle;
+              // console.log(roomTitleArr, senderName)
               let idx = roomTitleArr?.findIndex((name) => name === senderName);
-              // i am finding idx to be equal to 0 in one case but it is not slicing down
+
               if (idx >= 0) {
                 roomTitleArr.splice(idx, 1);
-                setRoomId(res?.roomData?.room?.roomName);
-                console.log(res);
+                setRoomId(res?.roomData?.roomName);
                 // setUserActivityStatus()
                 setRoom(roomTitleArr[0]);
               }
             } else {
               // if roomType is not one to one , then obviously it will be group or comminity in which only admin can enter name of the same, so no issues in using
-              res?.roomData?.room?.roomTitle[0];
+              res?.roomData?.roomTitle[0];
             }
             // console.log(data?.room)
           } else {
@@ -159,10 +152,8 @@ function ChatRoom({ userName, senderName, setUserName }) {
   };
 
   const removeLocal = () => {
-    localStorage.removeItem("userName");
-    setUserName("");
-    window.location.href = "/";
-    socket.emit("disconnect");
+    socket.disconnect();
+    window.location.reload()
   };
 
   // socket.on for receiving messages
@@ -176,6 +167,7 @@ function ChatRoom({ userName, senderName, setUserName }) {
 
   // emit for joining and sending your data
   useEffect(() => {
+    console.log(userName, senderName)
     joinEmit();
     // console.log("user joined:", userName);
   }, [userName, socket]);
@@ -216,7 +208,7 @@ function ChatRoom({ userName, senderName, setUserName }) {
         className="bg-red-400 px-2 py-1 ml-2 text-white"
         onClick={removeLocal}
       >
-        remove user
+        reset user
       </button>
       <div className="w-full text-2xl text-center">
         Current User: {userName}
@@ -227,8 +219,8 @@ function ChatRoom({ userName, senderName, setUserName }) {
         className={`w-[98%] md:w-[90vw] max-w-[1200px] flex flex-row mx-auto mt-2 border border-gray-300 rounded`}
       >
         <UserList
-          usersList={usersList}
-          setUsersList={setUsersList}
+          chatsList={chatsList}
+          setChatsList={setChatsList}
           userName={userName}
           joinRoom={joinRoom}
           senderName={senderName}

@@ -7,6 +7,11 @@ const messageSchema = new mongoose.Schema(
       required: [true, "roomName is required"],
       trim: true,
     },
+    roomTitle: {
+      type: Array,
+      required: [true, "roomTitle is required"],
+      trim: true,
+    },
     userId: {
       type: String,
       required: [true, "user id is required"],

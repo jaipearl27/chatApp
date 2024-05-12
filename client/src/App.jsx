@@ -1,10 +1,10 @@
 // import { useEffect, useState } from "react";
-import { useEffect, useState } from "react";
+import {  useLayoutEffect, useState } from "react";
 import "./App.css";
 
 import ChatRoom from "./components/ChatRoom";
 
-let user = localStorage.getItem('userName')
+const user = JSON.parse(localStorage.getItem('user'))
 
 function App() {
   // states
@@ -12,22 +12,25 @@ function App() {
   const [senderName, setSenderName] = useState("");
   const [inRoom, setInRoom] = useState(false);
 
-  useEffect(() => {
-    if(user?.length > 0){
-      setUserName(user);
+  useLayoutEffect(() => {
+
+    if(user){
+      setUserName(user.userName);
+      setSenderName(user.senderName)
       setInRoom(true)
     }
   }, []);
 
   const enterRoom = () => {
     if (userName.length > 0) setInRoom(true);
-    localStorage.setItem("userName", userName);
+    let data = {userName, senderName}
+    localStorage.setItem("user", JSON.stringify(data));
   };
 
   if (inRoom) {
     return (
       <>
-        <ChatRoom userName={userName} senderName={senderName} setUserName={setUserName} />
+        <ChatRoom userName={userName} senderName={senderName} setSenderName={setSenderName} setUserName={setUserName} />
       </>
     );
   } else {

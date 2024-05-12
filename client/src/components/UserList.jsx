@@ -4,11 +4,11 @@ import { IoIosArrowForward } from "react-icons/io"
 import axios from "axios";
 import { MagnifyingGlass } from "react-loader-spinner";
 
-const UserList = ({ myChats,usersList, setUsersList, userName, joinRoom, senderName}) => {
+const UserList = ({ chatsList, userName, joinRoom, senderName}) => {
   const [searchInput, setSearchInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchedUsers, setSearchedUsers] = useState([]);
-  const [activeUsers, setActiveUsers] = useState([])
+  const [activeUsers, setActiveUsers] = useState([]);
 
   useEffect(() => {
     if (searchInput.length <= 0) {
@@ -143,18 +143,15 @@ const UserList = ({ myChats,usersList, setUsersList, userName, joinRoom, senderN
       <div className="max-h-[90%] overflow-y-auto">
 
       </div>
-      {myChats &&
-        myChats
-          ?.filter((u) => u?.userName !== userName)
-          ?.map((user) => (
+      {chatsList?.map((chat) => (
             <div
-              key={user?._id}
+              key={chat?._id}
               className="flex flex-row gap-2 px-4 py-2 cursor-pointer hover:bg-slate-100 transition duration-300"
               // onClick={() => joinRoom(user?.userName)}
             >
               <div className="h-[30px] w-[30px] md:h-[40px] md:w-[40px] flex flex-col justify-center relative">
                 <img
-                  src={`${user?.avatar ? user?.avatar : "/noProfilePic.png"}`}
+                  src={`${chat?.avatar ? chat?.avatar : "/noProfilePic.png"}`}
                   alt="no profile pic"
                   className="w-[100%] h-[100%] rounded-full absolute"
                 />
@@ -164,7 +161,7 @@ const UserList = ({ myChats,usersList, setUsersList, userName, joinRoom, senderN
               </div>
               <div className="text-[#121212] flex flex-col justify-center">
                 <div className="font-medium text-[20px]">
-                  {user?.firstName + " " + user?.lastName}
+                  {chat?.firstName + " " + chat?.lastName}
                 </div>
                 {/* most recent message from this user, bold if we haven't read yet */}
                 <div className="text-xs font-[8px]">

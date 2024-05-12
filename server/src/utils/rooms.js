@@ -1,5 +1,3 @@
-import { getRoomChatHistory } from "./chats.js";
-
 let rooms = [];
 
 //  add room in socket
@@ -7,12 +5,7 @@ export const addRoom = (roomTitle, roomName, users, roomType, admins = []) => {
   let idx = rooms.findIndex((r) => r.roomName === roomName);
   // console.log(idx);
 
-   // getting chatHistory, if any
-   const chatHistory = getRoomChatHistory(roomName);
-
-   if (!chatHistory?.status) {
-     console.error(chatHistory?.message);
-   }
+ 
 
   if (idx < 0) {
     let roomData = {
@@ -25,11 +18,11 @@ export const addRoom = (roomTitle, roomName, users, roomType, admins = []) => {
 
     rooms.push(roomData);
 
-    return { status: true, room: roomData, chatData: chatHistory };
+    return { status: true, room: roomData };
   }
 
   //  bruh, if already exits then user is probably changing room
-  return { status: true, room: rooms[idx], chatData: chatHistory };
+  return { status: true, room: rooms[idx] };
 };
 
 // find room in socket

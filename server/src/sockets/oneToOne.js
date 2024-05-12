@@ -6,7 +6,7 @@ import {
   removeUser,
 } from "../../src/utils/users.js";
 import { addRoom, changeRoom } from "../utils/rooms.js";
-import { addChat } from "../utils/chats.js";
+import { addChat, getRoomChatHistory } from "../utils/chats.js";
 import { getChatHistory } from "../controllers/messageController.js";
 
 export function configureOneToOneNamespace(server) {
@@ -28,7 +28,7 @@ export function configureOneToOneNamespace(server) {
       const newUser = {
         userName: userName,
         socketId: socket.id,
-        roomName: "",
+        room: {},
       };
 
       // user added to socket
@@ -37,9 +37,9 @@ export function configureOneToOneNamespace(server) {
       if (adminid === process.env.ADMINID) {
         socket.emit("users", result.users);
       }
-      console.log(chatHistory)
+ 
 
-      if(chatHistory?.status) {
+      if (chatHistory?.status) {
         socket.emit("chatHistory", chatHistory)
       }
     });
@@ -47,17 +47,28 @@ export function configureOneToOneNamespace(server) {
     // on room join
     socket.on("joinRoom", ({ roomTitle, roomName, users, roomType }, cb) => {
       const result = addRoom(roomTitle, roomName, users, roomType);
-      // console.log(result);
       if (result?.status) {
-        const userData = enterRoom(socket.id, result?.room?.roomName);
-        if(userData?.previousRoom){
+        const userData = enterRoom(socket.id, result?.room);
+
+        if (userData?.previousRoom) {
           socket.leave(userData?.previousRoom)
         }
-        socket.join(userData?.user?.roomName);
+
+        socket.join(userData?.user?.room?.roomName);
+
+        // getting chatHistory, if any
+        const chatHistory = getRoomChatHistory(userData?.user?.room?.roomName);
+        
+        if (!chatHistory?.status) {
+          console.error(chatHistory?.message);
+        }
+
+
         cb({
           status: true,
           userData: userData,
-          roomData: result,
+          roomData: result?.room,
+          chatHistory: chatHistory
         });
       }
       cb({ status: false });
@@ -68,20 +79,20 @@ export function configureOneToOneNamespace(server) {
       const user = await findUser(socket.id);
 
       if (user) {
-        
+
         let date = new Date();
         let dateString = date.toString();
         let splitDate = dateString.split(" ");
         let timestamp = `${splitDate[2]} ${splitDate[1]} ${splitDate[3]} ${splitDate[4]}`;
-
         const messageData = {
           userId: data?.userId,
           userName: user?.user?.userName,
-          roomName: user.user?.roomName,
+          roomName: user.user?.room?.roomName,
+          roomTitle: user?.user?.room?.roomTitle,
           message: data?.message,
           timestamp: timestamp,
           reactions: [],
-          readBy: [{userId: data?.userId, userName: user?.user?.userName}],        
+          readBy: [{ userId: data?.userId, userName: user?.user?.userName }],
         }
 
         socket.emit("newMessage", messageData); // emit to the sender
@@ -90,7 +101,7 @@ export function configureOneToOneNamespace(server) {
 
 
         if (messageDataResult?.status) {
-          socket.to(user?.user?.roomName).emit("newMessage", messageDataResult);
+          socket.to(user?.user?.room?.roomName).emit("newMessage", messageDataResult?.messageData?.data);
         }
       }
     });

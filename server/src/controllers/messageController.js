@@ -41,6 +41,7 @@ export const getChatHistory = async (userName) => {
       $group: {
         _id: "$roomName",
         messages: { $push: "$$ROOT" },
+        roomTitle: { $first: "$roomTitle" }, // Extract roomTitle for each roomName
       },
     },
   ];
