@@ -112,6 +112,7 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
 
   const joinRoom = (receiverName, roomType, roomTitle) => {
     let users = [userName, receiverName].sort();
+    console.log(users)
     let roomName = "";
     users.forEach((e) => {
       roomName += e;
@@ -121,8 +122,8 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
         "joinRoom",
         { roomTitle, roomName, users, roomType },
         (res) => {
-          
           if (res?.status) {
+            console.log(res)
             // fill chat history when joining room
             setMessages(res?.chatHistory?.chats);
 

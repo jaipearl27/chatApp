@@ -1,45 +1,36 @@
 import mongoose from "mongoose";
 
-const roomSchema = new mongoose.Schema({
-  roomName: {
-    type: String,
-    required: [true, "roomName is required"],
-    trim: true,
-  },
-
-  roomTitle: {
-    type: [String],
-    required: [true, "roomTitle is required"],
-  },
-
-  roomType: {
-    type: String,
-    required: [true, "roomType is required"],
-    trim: true,
-  },
-  roomAvatar: [
-    {
-        type: String,
-        required: [true, "roomAvatar is required"],
-    }
-  ],
-  users: [
-    {
+const roomSchema = new mongoose.Schema(
+  {
+    roomName: {
       type: String,
+      required: [true, "roomName is required"],
+      trim: true,
+    },
+
+    roomTitle: {
+      type: [String],
+      required: [true, "roomTitle is required"],
+    },
+
+    roomType: {
+      type: String,
+      required: [true, "roomType is required"],
+      trim: true,
+    },
+    roomAvatar: {
+      type: [String],
+      required: [true, "roomAvatar is required"],
+    },
+    users: {
+      type: [String],
       required: [true, "users are required"],
     },
-  ],
-  admins: [
-    {
-      type: String,
+    admins: {
+      type: [String],
       required: [true, "admins are required"],
     },
-  ],
-  timestamp: {
-    type: String,
-    required: [true, "timestamp for message is required"],
-    trim: true,
   },
-
-});
+  { timestamps: true }
+);
 export const roomModel = mongoose.model("room", roomSchema);

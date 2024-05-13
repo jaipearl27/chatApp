@@ -1,35 +1,37 @@
-import { insertRoom } from "../controllers/roomController";
+import { insertRoom } from "../controllers/roomController.js";
 
 let rooms = [];
 
 //  add room in socket
-export const addRoom = async (roomTitle, roomName, users, roomType, admins = []) => {
-
+export const addRoom = async (
+  roomTitle,
+  roomName,
+  users,
+  roomType,
+  admins = []
+) => {
   let idx = rooms.findIndex((r) => r.roomName === roomName);
 
-  if (idx < 0) {
-    let roomData = {
-      roomTitle: roomTitle,
-      roomName: roomName,
-      users: users,
-      roomType: roomType,
-      admins: admins,
-    };
+  let roomData = {
+    roomTitle: roomTitle,
+    roomName: roomName,
+    users: users,
+    roomType: roomType,
+    admins: admins,
+  };
 
-    const result = await insertRoom(roomData)
-
-    if(result) {
-      console.log(result)
-      rooms.push(roomData);
-      return { status: true, room: roomData };
-    } else {
-      return {status: false, message: 'Room data not inserted in DB'}
-    }
+  const result = await insertRoom(roomData);
+  if (idx < 0 && result.status) {
+    // console.log(result)
+    rooms.push(roomData);
+    // console.log(rooms)
+    return { status: true, room: roomData };
+  } else if(idx >= 0 && result.status) {
+    rooms[idx] = roomData;
+    return { status: true, room: roomData, message:'room changes' };
   } else {
-
+    return { status: false, message: "Error changing/inserting room" };
   }
-
-  
 };
 
 // find room in socket

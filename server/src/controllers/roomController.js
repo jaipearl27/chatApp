@@ -2,22 +2,32 @@ import { roomModel } from "../models/roomModel.js";
 
 export const insertRoom = async (data) => {
   try {
-    const data = {
+    const data1 = {
       roomName: data.roomName,
       roomTitle: data.roomTitle,
       roomType: data.roomType,
-      user: data.userId,
+      users: data.users,
       admins: data.admins,
-    }
+    };
 
-    const roomData = new roomModel(data);
-    const result = await roomData.save();
+    const roomExists = await findRoom(data.roomName);
 
-    console.log("room added", result);
-    if (result) {
-      return { status: true, data: result };
+    if (roomExists.status) {
+      return {
+        status: true,
+        data: roomExists.data,
+        message: "room alredy exists, here's the data tho",
+      };
+    } else {
+      const roomData = new roomModel(data1);
+      const result = await roomData.save();
+
+      console.log("room added", result);
+      if (result) {
+        return { status: true, data: result };
+      }
+      return { status: false, data: null };
     }
-    return { status: false, data: null };
   } catch (error) {
     const response = {
       data: [],
@@ -28,3 +38,17 @@ export const insertRoom = async (data) => {
   }
 };
 
+export const findRoom = async (roomName) => {
+    try {
+        const result = await roomModel.find({ roomName: roomName });
+        // console.log(result)
+        if(result.length > 0) {
+            return {status: true, data: result}
+        } else {
+            return {status: false }
+        }
+    } catch (err) {
+        console.error(err)
+    }
+  
+}

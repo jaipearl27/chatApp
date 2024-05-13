@@ -3,18 +3,18 @@ import { messageModel } from "../models/messageModel.js";
 export const getAllMessages = async (roomId) => {
   try {
     if (!roomId) res.status(400).json({ message: "id not found" });
-    const messages = await jobModel.find({ roomId: roomId });
+    const messages = await messageModel.find({ roomName: roomId });
     if (messages.length > 0) {
       const response = {
-        data: messages,
+        chats: messages,
         status: true,
         message: `Messages found successfully`,
       };
       return response;
     } else {
       const response = {
-        data: messages,
-        status: false,
+        chats: messages,
+        status: true,
         message: `No messages for this room found`,
       };
       return response;
@@ -42,6 +42,7 @@ export const getChatHistory = async (userName) => {
         messages: { $push: "$$ROOT" },
         roomTitle: { $last: "$roomTitle" },
         roomType: { $last: "$roomType" },
+        users: {$last: "$users"}
       },
     },
   ];
@@ -59,7 +60,9 @@ export const addMessage = async (newMessage) => {
       roomName: newMessage.roomName,
       roomTitle: newMessage.roomTitle,
       roomType: newMessage.roomType,
-      user: newMessage.userId,
+      userId: newMessage.userId,
+      userName: newMessage.userName,
+      users: newMessage?.users,
       message: newMessage.message,
       readBy: newMessage.readBy,
       reactions: newMessage.reactions,

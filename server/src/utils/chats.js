@@ -10,6 +10,7 @@ export const addChat = async (data) => {
   let newMessage = {
     userId: data?.userId,
     userName: data?.userName,
+    users: data?.users,
     roomName: data?.roomName,
     roomTitle: data?.roomTitle,
     roomType: data.roomType,
@@ -30,22 +31,25 @@ export const addChat = async (data) => {
   }
 };
 
-export const getRoomChatHistory = (roomName) => {
-  let chatHistory = [];
+// export const getRoomChatHistory = (roomName) => {
+//   // let chatHistory = [];
   
-  chats.forEach((chat) => {
-    if (chat?.roomName === roomName) {
-      chatHistory.push(chat);
-    }
-  });
+//   const chatHistory = getAllMessages(roomName)
 
-  if (chatHistory.length > 0) {
-    return { status: true, chats: chatHistory };
-  }
 
-  return {
-    status: false,
-    chats: chatHistory,
-    message: `no chats found for room ${roomName}`,
-  };
-};
+//   // chats.forEach((chat) => {
+//   //   if (chat?.roomName === roomName) {
+//   //     chatHistory.push(chat);
+//   //   }
+//   // });
+
+//   // if (chatHistory.length > 0) {
+//   //   return { status: true, chats: chatHistory };
+//   // }
+
+//   return {
+//     status: false,
+//     chats: chatHistory,
+//     message: `no chats found for room ${roomName}`,
+//   };
+// };

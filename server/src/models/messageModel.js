@@ -20,12 +20,26 @@ const messageSchema = new mongoose.Schema(
       type: [String],
       required: [true, "roomAvatar is required"],
     },
-    user: {
-      type: mongoose.Types.ObjectId,
-      ref: "employee",
-      required: [true, "user id is required"],
+    userId: {
+      type: String,
+      required: [true, "userId is required"],
       trim: true,
     },
+    userName: {
+      type: String,
+      required: [true, "userName is required"],
+      trim: true,
+    },
+    users: {
+      type: [String],
+      required: [true, "users is required"],
+    },
+    // user: {
+    //   type: mongoose.Types.ObjectId,
+    //   ref: "employee",
+    //   required: [true, "user id is required"],
+    //   trim: true,
+    // },
     message: {
       type: String,
       required: [true, "message is required"],
@@ -51,23 +65,8 @@ const messageSchema = new mongoose.Schema(
       },
     ],
     replies: [
-      {
-        userId: {
-          type: String,
-          required: [true, "userId is required"],
-          trim: true,
-        },
-        userName: {
-          type: String,
-          required: [true, "userName is required"],
-          trim: true,
-        },
-        message: {
-          type: String,
-          required: [true, "reaction is required"],
-          trim: true,
-        },
-        reactions: [
+     
+      
           {
             userId: {
               type: mongoose.Types.ObjectId,

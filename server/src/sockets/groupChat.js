@@ -22,26 +22,19 @@ export function configureGroupChatNamespace(server) {
     // user joins
     console.log(`user with ${socket.id} joined`);
     socket.on("join", async (userName, adminid) => {
-
       const chatHistory = await getChatHistory(userName)
-
       const newUser = {
         userName: userName,
         socketId: socket.id,
         room: {},
-      };
-
-      // user added to socket
+      }
       const result = addUser(newUser);
-
       if (adminid === process.env.ADMINID) {
         socket.emit("users", result.users);
       }
- 
       if (chatHistory?.status) {
         socket.emit("chatHistory", chatHistory)
       }
-
     });
 
     // on room join
@@ -62,7 +55,6 @@ export function configureGroupChatNamespace(server) {
         if (!chatHistory?.status) {
           console.error(chatHistory?.message);
         }
-
 
         cb({
           status: true,
