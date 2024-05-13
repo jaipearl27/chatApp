@@ -1,6 +1,5 @@
 import { messageModel } from "../models/messageModel.js";
 
-// get all jobs data for the room/chat
 export const getAllMessages = async (roomId) => {
   try {
     if (!roomId) res.status(400).json({ message: "id not found" });
@@ -41,7 +40,8 @@ export const getChatHistory = async (userName) => {
       $group: {
         _id: "$roomName",
         messages: { $push: "$$ROOT" },
-        roomTitle: { $first: "$roomTitle" }, // Extract roomTitle for each roomName
+        roomTitle: { $last: "$roomTitle" },
+        roomType: { $last: "$roomType" },
       },
     },
   ];
@@ -57,15 +57,16 @@ export const addMessage = async (newMessage) => {
   try {
     const data = {
       roomName: newMessage.roomName,
-      userId: newMessage.userId,
-      userName: newMessage.userName,
+      roomTitle: newMessage.roomTitle,
+      roomType: newMessage.roomType,
+      user: newMessage.userId,
       message: newMessage.message,
       readBy: newMessage.readBy,
       reactions: newMessage.reactions,
       timestamp: newMessage.timestamp,
     };
 
-    const messageData = messageModel(data);
+    const messageData = new messageModel(data);
     const result = await messageData.save();
 
     console.log("message added", result);

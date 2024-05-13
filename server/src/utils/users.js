@@ -56,6 +56,9 @@ export const getAllActiveUsers = () => {
 // enter user in a room
 
 export const enterRoom = (socketId, room) => {
+
+
+
   let idx = users?.findIndex((user) => user?.socketId === socketId)
 
   if(idx < 0){

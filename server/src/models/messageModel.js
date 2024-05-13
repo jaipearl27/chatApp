@@ -8,17 +8,21 @@ const messageSchema = new mongoose.Schema(
       trim: true,
     },
     roomTitle: {
-      type: Array,
+      type: [String],
       required: [true, "roomTitle is required"],
+    },
+    roomType: {
+      type: String,
+      required: [true, "roomType is required"],
       trim: true,
     },
-    userId: {
-      type: String,
-      required: [true, "user id is required"],
-      trim: true,
+    roomAvatar: {
+      type: [String],
+      required: [true, "roomAvatar is required"],
     },
-    userName: {
-      type: String,
+    user: {
+      type: mongoose.Types.ObjectId,
+      ref: "employee",
       required: [true, "user id is required"],
       trim: true,
     },
@@ -28,7 +32,7 @@ const messageSchema = new mongoose.Schema(
       trim: true,
     },
     reactions: [
-      { 
+      {
         userId: {
           type: String,
           required: [true, "userId is required"],
@@ -47,7 +51,7 @@ const messageSchema = new mongoose.Schema(
       },
     ],
     replies: [
-      { 
+      {
         userId: {
           type: String,
           required: [true, "userId is required"],
@@ -64,10 +68,10 @@ const messageSchema = new mongoose.Schema(
           trim: true,
         },
         reactions: [
-          { 
+          {
             userId: {
               type: mongoose.Types.ObjectId,
-              ref: 'employees',
+              ref: "employees",
               required: [true, "userId is required"],
               trim: true,
             },
@@ -81,13 +85,13 @@ const messageSchema = new mongoose.Schema(
               required: [true, "reaction is required"],
               trim: true,
             },
-            required: [false]
+            required: [false],
           },
         ],
       },
     ],
     readBy: [
-      { 
+      {
         userId: {
           type: String,
           required: [true, "userId is required"],
@@ -97,15 +101,19 @@ const messageSchema = new mongoose.Schema(
           type: String,
           required: [true, "userName is required"],
           trim: true,
-        }
+        },
       },
     ],
     timestamp: {
       type: String,
       required: [true, "timestamp for message is required"],
       trim: true,
-    }
+    },
   },
   { 0: true }
 );
-export const messageModel = mongoose.model("messages", messageSchema, "messages");
+export const messageModel = mongoose.model(
+  "messages",
+  messageSchema,
+  "messages"
+);

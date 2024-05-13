@@ -9,16 +9,16 @@ import { addRoom, changeRoom } from "../utils/rooms.js";
 import { addChat, getRoomChatHistory } from "../utils/chats.js";
 import { getChatHistory } from "../controllers/messageController.js";
 
-export function configureOneToOneNamespace(server) {
+export function configureGroupChatNamespace(server) {
   const io = new Server(server, {
     cors: {
       origin: "http://localhost:5173",
     },
   });
 
-  const oneToOneNamespace = io.of("/onetoone");
+  const groupChatNamespace = io.of("/groupChat");
 
-  oneToOneNamespace.on("connection", (socket) => {
+  groupChatNamespace.on("connection", (socket) => {
     // user joins
     console.log(`user with ${socket.id} joined`);
     socket.on("join", async (userName, adminid) => {
@@ -38,17 +38,14 @@ export function configureOneToOneNamespace(server) {
         socket.emit("users", result.users);
       }
  
-
       if (chatHistory?.status) {
         socket.emit("chatHistory", chatHistory)
       }
+
     });
 
     // on room join
     socket.on("joinRoom", ({ roomTitle, roomName, users, roomType }, cb) => {
-
-     
-
       const result = addRoom(roomTitle, roomName, users, roomType);
       if (result?.status) {
         const userData = enterRoom(socket.id, result?.room);
@@ -79,14 +76,10 @@ export function configureOneToOneNamespace(server) {
 
     //on message
     socket.on("message", async (data) => {
-
-      // console.log(data)
-
-
       const user = await findUser(socket.id);
 
       if (user) {
-        console.log(user)
+
         let date = new Date();
         let dateString = date.toString();
         let splitDate = dateString.split(" ");
@@ -96,7 +89,6 @@ export function configureOneToOneNamespace(server) {
           userName: user?.user?.userName,
           roomName: user.user?.room?.roomName,
           roomTitle: user?.user?.room?.roomTitle,
-          roomType: user?.user?.room?.roomType,
           message: data?.message,
           timestamp: timestamp,
           reactions: [],

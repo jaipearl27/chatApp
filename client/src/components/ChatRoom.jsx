@@ -121,6 +121,7 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
         "joinRoom",
         { roomTitle, roomName, users, roomType },
         (res) => {
+          
           if (res?.status) {
             // fill chat history when joining room
             setMessages(res?.chatHistory?.chats);

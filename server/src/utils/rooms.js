@@ -1,11 +1,11 @@
+import { insertRoom } from "../controllers/roomController";
+
 let rooms = [];
 
 //  add room in socket
-export const addRoom = (roomTitle, roomName, users, roomType, admins = []) => {
-  let idx = rooms.findIndex((r) => r.roomName === roomName);
-  // console.log(idx);
+export const addRoom = async (roomTitle, roomName, users, roomType, admins = []) => {
 
- 
+  let idx = rooms.findIndex((r) => r.roomName === roomName);
 
   if (idx < 0) {
     let roomData = {
@@ -16,13 +16,20 @@ export const addRoom = (roomTitle, roomName, users, roomType, admins = []) => {
       admins: admins,
     };
 
-    rooms.push(roomData);
+    const result = await insertRoom(roomData)
 
-    return { status: true, room: roomData };
+    if(result) {
+      console.log(result)
+      rooms.push(roomData);
+      return { status: true, room: roomData };
+    } else {
+      return {status: false, message: 'Room data not inserted in DB'}
+    }
+  } else {
+
   }
 
-  //  bruh, if already exits then user is probably changing room
-  return { status: true, room: rooms[idx] };
+  
 };
 
 // find room in socket

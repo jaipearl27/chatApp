@@ -150,22 +150,22 @@ const UserList = ({ chatsList, userName, joinRoom, senderName}) => {
               // onClick={() => joinRoom(user?.userName)}
             >
               <div className="h-[30px] w-[30px] md:h-[40px] md:w-[40px] flex flex-col justify-center relative">
-                <img
+                {/* <img
                   src={`${chat?.avatar ? chat?.avatar : "/noProfilePic.png"}`}
                   alt="no profile pic"
                   className="w-[100%] h-[100%] rounded-full absolute"
-                />
+                /> */}
                 <span
                   className={`h-[8px] w-[8px] bg-[#53ff31] rounded-full absolute bottom-0 right-0`}
                 ></span>
               </div>
               <div className="text-[#121212] flex flex-col justify-center">
                 <div className="font-medium text-[20px]">
-                  {chat?.firstName + " " + chat?.lastName}
+                  {chat?.roomType === 'oneToOne' && chat?.roomTitle?.filter((e) => e !== senderName)}
                 </div>
                 {/* most recent message from this user, bold if we haven't read yet */}
                 <div className="text-xs font-[8px]">
-                  Sample last message in this chat...
+                  {chat?.messages && chat?.messages[chat?.messages?.length - 1]?.message}
                 </div>
               </div>
             </div>

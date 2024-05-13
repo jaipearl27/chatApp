@@ -5,12 +5,14 @@ let chats = [];
 
 export const addChat = async (data) => {
 
+  console.log(data?.roomTitle)
 
   let newMessage = {
     userId: data?.userId,
     userName: data?.userName,
     roomName: data?.roomName,
     roomTitle: data?.roomTitle,
+    roomType: data.roomType,
     message: data?.message,
     reactions: data?.reactions,
     readBy: data?.readBy,
