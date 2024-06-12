@@ -3,6 +3,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import { IoIosArrowForward } from "react-icons/io";
 import axios from "axios";
 import { MagnifyingGlass } from "react-loader-spinner";
+import { IoMdAdd } from "react-icons/io";
 
 const UserList = ({ chatsList, userName, joinRoom, senderName }) => {
   const [searchInput, setSearchInput] = useState("");
@@ -58,9 +59,17 @@ const UserList = ({ chatsList, userName, joinRoom, senderName }) => {
 
   return (
     <div
-      className="w-[300px] text-white flex flex-col gap-3"
+      className="w-[300px] text-white flex flex-col gap-3 relative"
       style={{ borderRight: "1px solid rgb(156, 163, 175) " }}
     >
+      <div
+        className="absolute bottom-4 left-4 z-[999] bg-white text-black rounded-full shadow-[0_0_0_1px#d1d1d1] hover:bg-slate-100 w-[50px] h-[50px] flex justify-center items-center text-3xl cursor-pointer"
+        onClick={() => {
+          makeGroup();
+        }}
+      >
+        <IoMdAdd />
+      </div>
       {/* search input */}
       <div className="flex flex-col gap-1">
         <div className="w-full flex flex-col justify-center relative p-2">

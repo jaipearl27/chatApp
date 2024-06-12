@@ -40,6 +40,8 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
 
   const [replyTo, setReplyTo] = useState(null);
 
+  const [makeGroup, setMakeGroup] = useState(false);
+
   // refs
   const messageInputRef = useRef();
   const threadMessageInputRef = useRef();
@@ -68,6 +70,13 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
     if (socket) {
       const handleNewMessage = (data) => {
         console.log(data)
+        Notification.requestPermission().then((perm) => {
+          if(perm === 'granted'){
+            new Notification(data.userName, {
+              body: data.message
+            })
+          }
+        })
         setMessages((prevMessages) => [...prevMessages, data]);
       };
 
@@ -75,7 +84,7 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
 
       socket.on("chatHistory", (data) => {
         setChatsList(data?.chatHistory)
-        console.log(data)
+        // console.log(data)
       })
 
       return () => {
@@ -226,6 +235,7 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
           userName={userName}
           joinRoom={joinRoom}
           senderName={senderName}
+          setMakeGroup={setMakeGroup}
         />
 
         {room?.length > 0 ? (
