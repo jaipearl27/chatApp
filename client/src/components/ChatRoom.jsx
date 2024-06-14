@@ -14,6 +14,7 @@ import Picker from "@emoji-mart/react";
 import { IoCloseOutline } from "react-icons/io5";
 import AppSvgs from "./AppSvgs";
 import Thread from "./Thread";
+import Profile from "./Profile";
 
 function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
   // states
@@ -39,6 +40,9 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
   const [selectedMessageIndex, setSelectedMessageIndex] = useState(null);
 
   const [replyTo, setReplyTo] = useState(null);
+  const [showProfile, setShowProfile] = useState(null);
+  const [showCreateGroup, setShowCreateGroup] = useState(false);
+
 
   const [makeGroup, setMakeGroup] = useState(false);
 
@@ -69,27 +73,27 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
     }
     if (socket) {
       const handleNewMessage = (data) => {
-        console.log(data)
+        console.log(data);
         Notification.requestPermission().then((perm) => {
-          if(perm === 'granted'){
+          if (perm === "granted") {
             new Notification(data.userName, {
-              body: data.message
-            })
+              body: data.message,
+            });
           }
-        })
+        });
         setMessages((prevMessages) => [...prevMessages, data]);
       };
 
       socket.on("newMessage", handleNewMessage);
 
       socket.on("chatHistory", (data) => {
-        setChatsList(data?.chatHistory)
+        setChatsList(data?.chatHistory);
         // console.log(data)
-      })
+      });
 
       return () => {
         socket.off("newMessage");
-        socket.off("chatHistory")
+        socket.off("chatHistory");
       };
     }
   }, [socket]);
@@ -121,7 +125,7 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
 
   const joinRoom = (receiverName, roomType, roomTitle) => {
     let users = [userName, receiverName].sort();
-    console.log(users)
+    console.log(users);
     let roomName = "";
     users.forEach((e) => {
       roomName += e;
@@ -132,13 +136,12 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
         { roomTitle, roomName, users, roomType },
         (res) => {
           if (res?.status) {
-            console.log(res)
+            console.log(res);
             // fill chat history when joining room
             setMessages(res?.chatHistory?.chats);
 
             // if room type is oneToOne then roomTitle will be of the other name out of 2 in that array
             if (res?.roomData?.roomType === "oneToOne") {
-
               let roomTitleArr = res?.roomData?.roomTitle;
               // console.log(roomTitleArr, senderName)
               let idx = roomTitleArr?.findIndex((name) => name === senderName);
@@ -164,7 +167,7 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
 
   const removeLocal = () => {
     socket.disconnect();
-    window.location.reload()
+    window.location.reload();
   };
 
   // socket.on for receiving messages
@@ -178,7 +181,7 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
 
   // emit for joining and sending your data
   useEffect(() => {
-    console.log(userName, senderName)
+    console.log(userName, senderName);
     joinEmit();
     // console.log("user joined:", userName);
   }, [userName, socket]);
@@ -208,7 +211,6 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
 
   return (
     <div>
-      {/*  emoji backdrop*/}
       {selectedMessageIndex !== null && (
         <div
           className="absolute w-screen h-full z-[1]"
@@ -243,7 +245,13 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
             {/* other user's name and image */}
             <div className="flex flex-col w-full">
               <div className="relative w-full border border-l-0 border-t-0 border-gray-300 text-black min-h-[50px] max-h-[50px] flex flex-col justify-center text-base pl-4 py-2">
-                <div className="flex flex-row gap-2 ">
+                <div
+                  className="flex flex-row gap-2"
+                  onClick={() => {
+                    setReplyTo(null);
+                    setShowProfile(room);
+                  }}
+                >
                   <div className="h-[40px] w-[40px] flex flex-col justify-center relative">
                     <img
                       src="/noProfilePic.png"
@@ -259,7 +267,7 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
                 </div>
 
                 {selectedMessageIndex !== null && (
-                  <div className="absolute w-[280px] z-[99] top-full right-[20%] lg:right-[20%] 2xl:right-[50%]  ">
+                  <div className="absolute w-[280px] z- [99] top-full right-[20%] lg:right-[20%] 2xl:right-[50%]  ">
                     <Picker data={data} onEmojiSelect={console.log} />
                   </div>
                 )}
@@ -327,7 +335,7 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
                                     title="Reply"
                                     onClick={() => {
                                       setReplyTo(message);
-                                      console.log("opening thread");
+                                      setShowProfile(null);
                                     }}
                                   >
                                     <IoReturnUpBackOutline size={18} />
@@ -404,6 +412,14 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
                 threadMessages={threadMessages}
               />
             )}
+
+            {/* chat thread */}
+            {showProfile && (
+              <Profile
+                showProfile={showProfile}
+                setShowProfile={setShowProfile}
+              />
+            )}
           </div>
         ) : (
           <div className="w-full h-[80vh] bg-white flex flex-col justify-center text-center text-2xl font-medium rounded">
@@ -411,11 +427,13 @@ function ChatRoom({ userName, senderName, setSenderName, setUserName }) {
           </div>
         )}
       </div>
+      {showCreateGroup && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-md w-[300px] flex flex-col gap-1 p-3">
+          <IoCloseOutline size={24} className="cursor-pointer" onClick={() => setShowCreateGroup(false)} />
+        </div>
+      )}
     </div>
   );
 }
 
 export default ChatRoom;
-
-
-

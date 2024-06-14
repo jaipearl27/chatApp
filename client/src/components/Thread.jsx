@@ -30,7 +30,6 @@ const Thread = ({replyTo, setReplyTo, handleThreadMessageSend, threadMessageInpu
                                   alt="no profile pic"
                                   className="w-[25px] h-[25px] rounded-full relative"
                                 />
-
                                 <div
                                   className="bg-[#ececff] w-fit max-w-full text-gray-700 border border-gray-300 px-3 py-1 shadow-xs text-wrap break-words h-fit "
                                   style={{ borderRadius: "0 12px 12px 12px" }}
@@ -38,8 +37,6 @@ const Thread = ({replyTo, setReplyTo, handleThreadMessageSend, threadMessageInpu
                                   {replyTo?.message}
                                 </div>
                                 <div className="flex flex-col justify-center">
-                             
-
                                   <div
                                     className="flex flex-col justify-center rounded-full cursor-pointer hover:scale-110 transition duration-300 w-fit relative"
                                     // onClick={() => selectThreadMessage(idx)}
